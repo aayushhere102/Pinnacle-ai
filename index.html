@@ -1,0 +1,2230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pinnacle — AI Smart Study Super App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* ===================== DESIGN TOKENS ===================== */
+:root{
+  --white:#ffffff;
+  --bg:#f7f6fb;
+  --bg-2:#f1eef9;
+  --grey-50:#f8f8fa;
+  --grey-100:#eeeef2;
+  --grey-200:#e3e2ea;
+  --grey-300:#cdccd6;
+  --grey-400:#a6a4b4;
+  --grey-500:#807e92;
+  --grey-600:#5e5c6e;
+  --grey-700:#403e4d;
+  --grey-900:#211f2b;
+  --purple-50:#f5f2fd;
+  --purple-100:#ebe4fb;
+  --purple-200:#d9cdf7;
+  --purple-300:#bfaaf0;
+  --purple-400:#a382e8;
+  --purple-500:#8b5fdf;
+  --purple-600:#7445cf;
+  --purple-700:#5d33ab;
+  --gold:#e8b339;
+  --gold-deep:#c49120;
+  --green:#3fb87f;
+  --red:#e0566b;
+  --blue:#5b8def;
+  --radius-s:10px;
+  --radius-m:16px;
+  --radius-l:24px;
+  --radius-xl:32px;
+  --shadow-sm: 0 2px 8px rgba(93,51,171,0.06);
+  --shadow-md: 0 8px 24px rgba(93,51,171,0.10);
+  --shadow-lg: 0 16px 40px rgba(93,51,171,0.14);
+  --font-display:'Outfit', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+}
+[data-theme="dark"]{
+  --white:#1c1a24;
+  --bg:#14131a;
+  --bg-2:#1a1822;
+  --grey-50:#211f2b;
+  --grey-100:#272534;
+  --grey-200:#322f40;
+  --grey-300:#454258;
+  --grey-400:#615d75;
+  --grey-500:#8a86a0;
+  --grey-600:#a9a5bd;
+  --grey-700:#cac6dc;
+  --grey-900:#f1eef9;
+  --purple-50:#241f38;
+  --purple-100:#2c2645;
+  --purple-200:#3a3158;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.35);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.45);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  font-family:var(--font-body);
+  background:
+    radial-gradient(900px 500px at 90% -10%, var(--purple-100), transparent 60%),
+    radial-gradient(700px 500px at -10% 10%, var(--bg-2), transparent 55%),
+    var(--bg);
+  color:var(--grey-900);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+#app{min-height:100vh; max-width:560px; margin:0 auto; position:relative; padding-bottom:86px;}
+::selection{background:var(--purple-200);}
+a{color:inherit;}
+button{font-family:inherit; cursor:pointer; border:none; background:none;}
+input,textarea,select{font-family:inherit; font-size:15px;}
+h1,h2,h3,h4{font-family:var(--font-display); color:var(--grey-900); letter-spacing:-0.01em;}
+.scr{ padding:20px 18px 28px; animation:fadeUp .38s ease both; }
+@keyframes fadeUp{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+.muted{color:var(--grey-500);}
+.row{display:flex; align-items:center;}
+.row.between{justify-content:space-between;}
+.row.gap-8{gap:8px;}
+.row.gap-12{gap:12px;}
+.col{display:flex; flex-direction:column;}
+.spacer{flex:1;}
+
+/* ===================== BUTTONS ===================== */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 22px; border-radius:var(--radius-m); font-weight:600; font-size:15px;
+  transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+.btn:active{transform:scale(.96);}
+.btn-primary{
+  background:linear-gradient(135deg, var(--purple-500), var(--purple-700));
+  color:#fff; box-shadow:0 8px 20px rgba(116,69,207,0.35);
+}
+.btn-primary:hover{box-shadow:0 10px 26px rgba(116,69,207,0.45);}
+.btn-secondary{ background:var(--white); color:var(--purple-700); border:1.5px solid var(--purple-200); box-shadow:var(--shadow-sm);}
+.btn-ghost{ background:var(--purple-50); color:var(--purple-700); }
+.btn-block{width:100%;}
+.btn-sm{padding:9px 14px; font-size:13px; border-radius:var(--radius-s);}
+.btn:disabled{opacity:.45; pointer-events:none;}
+.btn-danger{background:linear-gradient(135deg,#ef7c8e,var(--red)); color:#fff;}
+.icon-btn{width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--white); box-shadow:var(--shadow-sm); font-size:17px;}
+
+/* ===================== CARDS ===================== */
+.card{
+  background:var(--white); border-radius:var(--radius-l); padding:18px;
+  box-shadow:var(--shadow-sm); border:1px solid var(--grey-100);
+}
+.card.glass{
+  background:linear-gradient(155deg, rgba(255,255,255,0.85), rgba(245,242,253,0.7));
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.6);
+}
+.card.tap{transition:transform .15s ease, box-shadow .15s ease;}
+.card.tap:active{transform:scale(.98);}
+.section-title{font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--grey-500); margin:22px 2px 10px;}
+
+/* ===================== FORM ELEMENTS ===================== */
+.field{margin-bottom:16px;}
+.field label{display:block; font-size:13px; font-weight:600; color:var(--grey-600); margin-bottom:7px;}
+.field input[type=text], .field input[type=number], .field textarea, .field select{
+  width:100%; padding:13px 14px; border-radius:var(--radius-s); border:1.5px solid var(--grey-200);
+  background:var(--grey-50); color:var(--grey-900); outline:none; transition:border-color .15s, background .15s;
+}
+.field input:focus, .field textarea:focus, .field select:focus{border-color:var(--purple-400); background:var(--white);}
+.field textarea{resize:vertical; min-height:80px;}
+.chip-group{display:flex; flex-wrap:wrap; gap:8px;}
+.chip{
+  padding:9px 14px; border-radius:999px; border:1.5px solid var(--grey-200); background:var(--white);
+  font-size:13px; font-weight:600; color:var(--grey-600); transition:all .15s ease;
+}
+.chip.active{background:linear-gradient(135deg,var(--purple-500),var(--purple-700)); color:#fff; border-color:transparent; box-shadow:0 4px 14px rgba(116,69,207,.3);}
+.chip-cat{font-size:11px; font-weight:700; text-transform:uppercase; color:var(--grey-400); letter-spacing:.05em; margin:14px 0 8px;}
+.progress-track{height:8px; background:var(--grey-100); border-radius:999px; overflow:hidden;}
+.progress-fill{height:100%; border-radius:999px; background:linear-gradient(90deg,var(--purple-400),var(--purple-600)); transition:width .5s ease;}
+
+/* ===================== LANDING ===================== */
+.landing{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 28px;}
+.landing-logo{
+  width:84px; height:84px; border-radius:26px; display:flex; align-items:center; justify-content:center;
+  font-size:40px; background:linear-gradient(145deg,var(--purple-400),var(--purple-700)); box-shadow:0 14px 34px rgba(116,69,207,.4);
+  margin-bottom:22px; animation:floaty 4s ease-in-out infinite;
+}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(0deg);} 50%{transform:translateY(-8px) rotate(-3deg);}}
+.landing h1{font-size:34px; font-weight:800; line-height:1.15; margin-bottom:10px;}
+.landing h1 span{color:var(--purple-600);}
+.landing p.tag{color:var(--grey-500); font-size:15.5px; margin-bottom:34px; max-width:320px;}
+.landing-pills{display:flex; gap:10px; margin-top:30px; flex-wrap:wrap; justify-content:center;}
+.landing-pill{font-size:12px; font-weight:600; padding:7px 13px; border-radius:999px; background:var(--white); color:var(--grey-600); box-shadow:var(--shadow-sm);}
+
+/* ===================== TOP BAR ===================== */
+.topbar{display:flex; align-items:center; justify-content:space-between; padding:18px 18px 6px;}
+.topbar h2{font-size:20px; font-weight:800;}
+.back-btn{font-size:20px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:var(--grey-100);}
+
+/* ===================== STEP DOTS ===================== */
+.step-dots{display:flex; gap:6px; justify-content:center; margin:6px 0 22px;}
+.step-dot{width:26px; height:5px; border-radius:4px; background:var(--grey-200);}
+.step-dot.active{background:var(--purple-500);}
+
+/* ===================== DASHBOARD ===================== */
+.profile-card{
+  background:linear-gradient(150deg, var(--purple-600), var(--purple-700) 60%, #4a2a8f);
+  border-radius:var(--radius-xl); padding:22px; color:#fff; position:relative; overflow:hidden; box-shadow:var(--shadow-lg);
+}
+.profile-card::before{content:''; position:absolute; width:220px; height:220px; background:radial-gradient(circle, rgba(255,255,255,.18), transparent 70%); top:-90px; right:-60px;}
+.avatar{
+  width:54px; height:54px; border-radius:18px; background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:20px; border:1.5px solid rgba(255,255,255,.35);
+}
+.level-badge{font-size:11px; font-weight:700; background:rgba(255,255,255,.2); padding:3px 9px; border-radius:999px; margin-top:4px; display:inline-block;}
+.xp-track{height:9px; background:rgba(255,255,255,.22); border-radius:999px; margin-top:14px; overflow:hidden;}
+.xp-fill{height:100%; background:linear-gradient(90deg,var(--gold),#fde68a); border-radius:999px; transition:width .6s ease;}
+.stat-row{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:18px;}
+.stat-mini{background:rgba(255,255,255,.14); border-radius:14px; padding:10px; text-align:center;}
+.stat-mini .v{font-size:17px; font-weight:800;}
+.stat-mini .l{font-size:10.5px; opacity:.85; margin-top:2px;}
+
+.ring-wrap{position:relative; width:74px; height:74px;}
+.quick-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.quick-card{padding:16px; border-radius:var(--radius-m); background:var(--white); box-shadow:var(--shadow-sm); border:1px solid var(--grey-100); transition:transform .15s;}
+.quick-card:active{transform:scale(.96);}
+.quick-card .qi{font-size:22px;}
+.quick-card .qt{font-weight:700; font-size:14px; margin-top:8px;}
+.quick-card .qs{font-size:11.5px; color:var(--grey-500); margin-top:2px;}
+
+.task-item{display:flex; align-items:center; gap:12px; padding:12px; border-radius:14px; background:var(--white); border:1px solid var(--grey-100); margin-bottom:8px;}
+.task-check{width:22px; height:22px; border-radius:7px; border:2px solid var(--grey-300); flex:none; display:flex; align-items:center; justify-content:center; font-size:13px;}
+.task-check.done{background:var(--green); border-color:var(--green); color:#fff;}
+
+.achv{display:flex; align-items:center; gap:10px; background:var(--white); padding:10px 12px; border-radius:14px; border:1px solid var(--grey-100); margin-bottom:8px;}
+.achv .ai{width:36px; height:36px; border-radius:10px; background:var(--purple-50); display:flex; align-items:center; justify-content:center; font-size:17px;}
+
+/* ===================== BOTTOM NAV ===================== */
+.bottomnav{
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:560px;
+  background:rgba(255,255,255,.88); backdrop-filter:blur(16px); border-top:1px solid var(--grey-100);
+  display:flex; justify-content:space-around; padding:9px 4px 12px; z-index:50;
+}
+[data-theme="dark"] .bottomnav{background:rgba(28,26,36,.9);}
+.navbtn{display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10.5px; font-weight:600; color:var(--grey-400); padding:4px 10px; border-radius:12px; transition:color .15s;}
+.navbtn .ni{font-size:19px;}
+.navbtn.active{color:var(--purple-600);}
+
+/* ===================== STUDY / GRID ===================== */
+.feat-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:6px;}
+.feat-card{
+  background:var(--white); border-radius:var(--radius-m); padding:16px; box-shadow:var(--shadow-sm); border:1px solid var(--grey-100);
+  display:flex; flex-direction:column; gap:8px; min-height:108px; position:relative;
+}
+.feat-card .fi{width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:18px;}
+.feat-card .ft{font-weight:700; font-size:13.5px;}
+.feat-card .fs{font-size:11px; color:var(--grey-500);}
+.feat-badge{position:absolute; top:10px; right:10px; font-size:9px; font-weight:700; background:var(--green); color:#fff; padding:2px 7px; border-radius:999px;}
+
+.chapter-pill{display:flex; align-items:center; gap:10px; background:var(--white); border:1.5px solid var(--grey-200); padding:11px 13px; border-radius:14px; margin-bottom:8px;}
+.chapter-pill.sel{border-color:var(--purple-400); background:var(--purple-50);}
+
+/* ===================== LOADING / AI ===================== */
+.ai-loading{display:flex; flex-direction:column; align-items:center; justify-content:center; padding:50px 20px; gap:14px;}
+.spinner{
+  width:46px; height:46px; border-radius:50%; position:relative;
+  background:conic-gradient(from 0deg, var(--purple-200), var(--purple-500) 60%, var(--purple-200));
+  animation:spin .9s linear infinite;
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 5px));
+  mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 5px));
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.dot-loader{display:flex; gap:5px;}
+.dot-loader span{width:7px; height:7px; border-radius:50%; background:var(--purple-400); animation:dotBounce 1.1s ease-in-out infinite;}
+.dot-loader span:nth-child(2){animation-delay:.15s;}
+.dot-loader span:nth-child(3){animation-delay:.3s;}
+@keyframes dotBounce{0%,80%,100%{transform:translateY(0); opacity:.5;} 40%{transform:translateY(-6px); opacity:1;}}
+
+/* ===================== BOOT SPLASH ===================== */
+#bootSplash{
+  position:fixed; inset:0; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:radial-gradient(900px 500px at 50% 0%, var(--purple-100), var(--bg) 60%);
+  transition:opacity .5s ease, visibility .5s ease;
+}
+#bootSplash.hide{opacity:0; visibility:hidden; pointer-events:none;}
+.splash-logo{
+  width:78px; height:78px; border-radius:24px; display:flex; align-items:center; justify-content:center; font-size:36px;
+  background:linear-gradient(145deg,var(--purple-400),var(--purple-700)); box-shadow:0 14px 34px rgba(116,69,207,.4);
+  animation:splashPulse 1.4s ease-in-out infinite;
+}
+@keyframes splashPulse{0%,100%{transform:scale(1);} 50%{transform:scale(1.08);}}
+.splash-name{font-family:var(--font-display); font-weight:800; font-size:18px; margin-top:16px; color:var(--grey-900); letter-spacing:.01em;}
+
+/* ===================== LANDING AMBIENT BLOBS ===================== */
+.landing{position:relative; overflow:hidden;}
+.bg-blob{position:absolute; border-radius:50%; filter:blur(50px); opacity:.45; z-index:0; animation:blobDrift 9s ease-in-out infinite;}
+.bg-blob.b1{width:200px; height:200px; background:var(--purple-300); top:6%; left:-60px; animation-duration:11s;}
+.bg-blob.b2{width:160px; height:160px; background:#fde68a; bottom:12%; right:-50px; animation-duration:8s; animation-delay:1s;}
+.bg-blob.b3{width:130px; height:130px; background:#a7d8ff; top:55%; left:70%; animation-duration:10s; animation-delay:2s;}
+@keyframes blobDrift{0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(14px,-18px) scale(1.12);}}
+.landing > *{position:relative; z-index:1;}
+
+/* ===================== PROGRESS RING WIDGET ===================== */
+.ring-card{display:flex; align-items:center; gap:16px;}
+.ring-svg{transform:rotate(-90deg);}
+.ring-svg circle{transition:stroke-dashoffset .8s cubic-bezier(.4,.2,.2,1);}
+.ring-center-label{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; font-family:var(--font-mono); color:var(--purple-700);}
+
+/* ===================== NAV ACTIVE DOT ===================== */
+.navbtn{position:relative;}
+.navbtn .ni{transition:transform .25s cubic-bezier(.34,1.5,.64,1);}
+.navbtn.active .ni{transform:translateY(-2px) scale(1.12);}
+.nav-dot{width:4px; height:4px; border-radius:50%; background:var(--purple-600); margin-top:1px; opacity:0; transform:scale(0); transition:all .25s ease;}
+.navbtn.active .nav-dot{opacity:1; transform:scale(1);}
+.ai-bubble{background:var(--purple-50); border-radius:16px; padding:14px 16px; font-size:14.5px; line-height:1.55; color:var(--grey-700); white-space:pre-wrap;}
+.content-block{margin-bottom:14px;}
+.tag-pill{font-size:10.5px; font-weight:700; background:var(--purple-100); color:var(--purple-700); padding:3px 9px; border-radius:999px; text-transform:uppercase; letter-spacing:.04em;}
+
+/* ===================== FLASHCARD ===================== */
+.flash-stage{height:230px; perspective:1200px; margin:10px 0;}
+.flash-card{width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform .5s cubic-bezier(.4,.2,.2,1); cursor:pointer;}
+.flash-card.flipped{transform:rotateY(180deg);}
+.flash-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius-l); display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; font-weight:600; font-size:17px; box-shadow:var(--shadow-md);}
+.flash-front{background:linear-gradient(150deg,var(--white),var(--purple-50)); color:var(--grey-900); border:1.5px solid var(--purple-100);}
+.flash-back{background:linear-gradient(150deg,var(--purple-600),var(--purple-700)); color:#fff; transform:rotateY(180deg);}
+
+/* ===================== TEST ===================== */
+.mcq-opt{display:flex; align-items:center; gap:10px; padding:13px 14px; border-radius:14px; border:1.5px solid var(--grey-200); background:var(--white); margin-bottom:9px; font-size:14.5px; transition:all .15s;}
+.mcq-opt.sel{border-color:var(--purple-400); background:var(--purple-50);}
+.mcq-opt.correct{border-color:var(--green); background:#eafbf2;}
+.mcq-opt.wrong{border-color:var(--red); background:#fdecef;}
+.mcq-letter{width:26px; height:26px; border-radius:8px; background:var(--grey-100); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex:none;}
+
+/* ===================== ORAL TEST / DEBATE COURTROOM ===================== */
+.courtroom{
+  border-radius:var(--radius-l); overflow:hidden; position:relative; padding:26px 18px 22px;
+  background:
+    radial-gradient(500px 240px at 50% -30px, rgba(196,145,32,.18), transparent 70%),
+    linear-gradient(180deg, #2b2440 0%, #1d1830 55%, #14101f 100%);
+  color:#fff; box-shadow:var(--shadow-lg);
+}
+.court-bench{display:flex; flex-direction:column; align-items:center; margin-bottom:18px;}
+.judge-avatar{width:64px; height:64px; border-radius:50%; background:linear-gradient(145deg,#e8d9a0,#c4912c); display:flex; align-items:center; justify-content:center; font-size:30px; box-shadow:0 0 0 4px rgba(232,179,57,.25), 0 10px 22px rgba(0,0,0,.4);}
+.judge-label{font-size:11px; font-weight:700; letter-spacing:.06em; color:var(--gold); margin-top:8px; text-transform:uppercase;}
+.gavel{font-size:13px; margin-top:3px; opacity:.8;}
+.vs-row{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:6px;}
+.duel-side{flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;}
+.duel-avatar{width:58px; height:58px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; box-shadow:0 8px 18px rgba(0,0,0,.35);}
+.duel-avatar.user{background:linear-gradient(150deg,var(--purple-400),var(--purple-600));}
+.duel-avatar.ai{background:linear-gradient(150deg,#3a3550,#221d35); border:1.5px solid rgba(255,255,255,.15);}
+.duel-name{font-size:12.5px; font-weight:700;}
+.duel-score{font-size:19px; font-weight:800; font-family:var(--font-mono);}
+.vs-mid{font-family:var(--font-display); font-weight:800; color:var(--gold); font-size:15px; flex:none;}
+.court-question{background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:16px; margin-top:18px; font-size:15px; line-height:1.5;}
+.court-qnum{font-size:11px; color:var(--gold); font-weight:700; margin-bottom:6px; letter-spacing:.05em;}
+.court-answerbox textarea{background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.18); color:#fff; border-radius:14px; padding:13px; width:100%; min-height:80px;}
+.court-answerbox textarea::placeholder{color:rgba(255,255,255,.4);}
+.verdict-row{display:flex; gap:10px; margin-top:14px;}
+.verdict-box{flex:1; background:rgba(255,255,255,.06); border-radius:12px; padding:10px; text-align:center;}
+.verdict-box .vv{font-size:20px; font-weight:800;}
+.verdict-box.win{background:rgba(63,184,127,.18); border:1px solid rgba(63,184,127,.4);}
+.verdict-box.lose{background:rgba(224,86,107,.14); border:1px solid rgba(224,86,107,.35);}
+.mode-card{border-radius:var(--radius-m); padding:16px; border:1.5px solid var(--grey-200); background:var(--white); margin-bottom:10px; display:flex; align-items:center; gap:14px;}
+.mode-card.sel{border-color:var(--purple-400); background:var(--purple-50); box-shadow:0 4px 14px rgba(139,95,223,.15);}
+.mode-dot{width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:#fff; flex:none;}
+
+/* ===================== PLANNER ===================== */
+.day-card{background:var(--white); border-radius:16px; border:1px solid var(--grey-100); padding:14px; margin-bottom:10px; box-shadow:var(--shadow-sm);}
+.day-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;}
+.day-head .dn{font-weight:800; font-size:14.5px;}
+.day-head .dd{font-size:11.5px; color:var(--grey-500);}
+.plan-task{display:flex; gap:8px; align-items:flex-start; font-size:13px; padding:7px 0; border-top:1px dashed var(--grey-200);}
+.plan-task:first-of-type{border-top:none;}
+
+/* ===================== PROGRESS ===================== */
+.bar-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.bar-row .bl{width:84px; font-size:12px; font-weight:600; color:var(--grey-600); flex:none;}
+.bar-row .bt{flex:1; height:10px; background:var(--grey-100); border-radius:999px; overflow:hidden;}
+.bar-row .bv{font-size:12px; font-weight:700; width:34px; text-align:right; flex:none;}
+
+/* ===================== TOASTS / REWARD ===================== */
+#toastLayer{position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:560px; z-index:999; pointer-events:none;}
+.reward-pop{
+  position:absolute; left:50%; top:90px; transform:translate(-50%,0); background:var(--white); border-radius:20px;
+  padding:18px 26px; box-shadow:0 20px 50px rgba(0,0,0,.25); display:flex; flex-direction:column; align-items:center; gap:6px;
+  animation:rewardIn .45s cubic-bezier(.34,1.4,.64,1) forwards, rewardOut .4s ease forwards 1.9s;
+  border:2px solid var(--gold);
+}
+@keyframes rewardIn{from{opacity:0; transform:translate(-50%,-20px) scale(.7);} to{opacity:1; transform:translate(-50%,0) scale(1);}}
+@keyframes rewardOut{from{opacity:1;} to{opacity:0; transform:translate(-50%,-12px) scale(.9);}}
+.reward-pop .rcoin{font-size:34px;}
+.reward-pop .ramt{font-size:21px; font-weight:800; color:var(--gold-deep); font-family:var(--font-mono);}
+.reward-pop .rlbl{font-size:12px; color:var(--grey-500); font-weight:600;}
+.float-yuh{position:absolute; font-weight:800; font-size:15px; color:var(--gold-deep); animation:floatUp 1.1s ease forwards; pointer-events:none; z-index:998; font-family:var(--font-mono);}
+@keyframes floatUp{0%{opacity:0; transform:translateY(0) scale(.7);} 15%{opacity:1; transform:translateY(-6px) scale(1.1);} 100%{opacity:0; transform:translateY(-60px) scale(1);}}
+.confetti-piece{position:fixed; top:-10px; width:8px; height:14px; z-index:997; pointer-events:none; animation:confettiFall linear forwards;}
+@keyframes confettiFall{to{transform:translateY(110vh) rotate(540deg); opacity:.2;}}
+.levelup-overlay{position:fixed; inset:0; background:rgba(20,16,30,.78); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:996; animation:fadeUp .3s ease;}
+.levelup-card{background:linear-gradient(160deg,var(--purple-500),var(--purple-700)); border-radius:28px; padding:34px 30px; text-align:center; color:#fff; max-width:300px; box-shadow:0 30px 60px rgba(0,0,0,.5);}
+
+/* ===================== MISC ===================== */
+.empty-state{text-align:center; padding:50px 20px; color:var(--grey-500);}
+.empty-state .ei{font-size:40px; margin-bottom:10px;}
+.streak-flame{font-size:15px;}
+.modal-bg{position:fixed; inset:0; background:rgba(20,16,30,.5); z-index:200; display:flex; align-items:flex-end; backdrop-filter:blur(2px);}
+.modal-sheet{background:var(--white); width:100%; max-width:560px; margin:0 auto; border-radius:24px 24px 0 0; padding:22px 18px 30px; max-height:82vh; overflow-y:auto; animation:sheetUp .3s ease;}
+@keyframes sheetUp{from{transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+.sheet-handle{width:38px; height:4px; background:var(--grey-200); border-radius:99px; margin:0 auto 16px;}
+.toggle-row{display:flex; background:var(--grey-100); border-radius:12px; padding:3px; margin-bottom:14px;}
+.toggle-row button{flex:1; padding:9px; border-radius:10px; font-weight:600; font-size:13px; color:var(--grey-500);}
+.toggle-row button.active{background:var(--white); color:var(--purple-700); box-shadow:var(--shadow-sm);}
+.mic-btn{width:64px; height:64px; border-radius:50%; background:linear-gradient(150deg,var(--purple-500),var(--purple-700)); display:flex; align-items:center; justify-content:center; font-size:26px; color:#fff; box-shadow:0 10px 26px rgba(116,69,207,.4); margin:0 auto;}
+.mic-btn.listening{animation:pulse 1.1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(116,69,207,.5);} 50%{box-shadow:0 0 0 14px rgba(116,69,207,0);}}
+.skeleton{background:linear-gradient(90deg,var(--grey-100) 25%,var(--grey-200) 37%,var(--grey-100) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:8px;}
+@keyframes shimmer{0%{background-position:100% 50%;} 100%{background-position:0 50%;}}
+.theme-toggle{width:42px; height:24px; border-radius:99px; background:var(--grey-200); position:relative; flex:none;}
+.theme-toggle .dot{width:18px; height:18px; border-radius:50%; background:var(--white); position:absolute; top:3px; left:3px; transition:left .2s ease; box-shadow:var(--shadow-sm);}
+[data-theme="dark"] .theme-toggle{background:var(--purple-500);}
+[data-theme="dark"] .theme-toggle .dot{left:21px;}
+</style>
+</head>
+<body data-theme="light">
+<div id="bootSplash"><div class="splash-logo">🎓</div><div class="splash-name">Pinnacle AI Study</div><div class="dot-loader" style="margin-top:14px;"><span></span><span></span><span></span></div></div>
+<div id="app"></div>
+<div id="toastLayer"></div>
+<script>
+/* =========================================================================
+   PINNACLE — AI SMART STUDY SUPER APP
+   Core engine: state, storage, gamification, router, toasts
+   ========================================================================= */
+
+/* ---------- STATIC CONFIG (app content, not user data) ---------- */
+const CLASS_LIST = [
+  "Nursery","LKG","UKG","Class 1","Class 2","Class 3","Class 4","Class 5",
+  "Class 6","Class 7","Class 8","Class 9","Class 10","Class 11","Class 12",
+  "College / University","JEE Aspirant","NEET Aspirant","UPSC Aspirant","Other Competitive Exam"
+];
+const BOARD_LIST = ["CBSE","ICSE","State Board","International (IB/IGCSE)","University","Other"];
+const LANGUAGE_LIST = ["English","Hindi","Hinglish","Regional Language"];
+
+const SUBJECT_CATALOG = {
+  "School Core": ["Mathematics","Physics","Chemistry","Biology","Science","English","Hindi","Social Science","History","Geography","Civics","Computer Science","General Knowledge","Environmental Science","Moral Science","Physical Education","Arts","Music","Sanskrit","French","German"],
+  "Competitive Exams": ["JEE Physics","JEE Chemistry","JEE Maths","NEET Biology","NEET Physics","NEET Chemistry","NDA","SSC","Banking","UPSC GS","Reasoning","Quantitative Aptitude","Current Affairs"],
+  "Commerce": ["Accountancy","Business Studies","Economics","Taxation","Marketing","Entrepreneurship","Auditing"],
+  "Humanities": ["Psychology","Sociology","Political Science","Philosophy","History (Advanced)","Anthropology"],
+  "Tech": ["Programming","DSA","Web Development","App Development","AI / ML Basics","Cyber Security","Databases"],
+  "Advanced / University": ["Law","Medicine","Architecture","Mechanical Engineering","Civil Engineering","Electrical Engineering","Computer Engineering","Research Methodology"]
+};
+
+const ACHIEVEMENT_DEFS = [
+  {id:"first_chapter", icon:"📘", title:"First Chapter", desc:"Added your first chapter", check:s=>s.chapters.length>=1},
+  {id:"first_note", icon:"📝", title:"Note Taker", desc:"Generated your first notes", check:s=>countContent(s,'notes')>=1},
+  {id:"first_test", icon:"🧪", title:"Test Rookie", desc:"Completed your first test", check:s=>s.testHistory.length>=1},
+  {id:"streak3", icon:"🔥", title:"3-Day Streak", desc:"Studied 3 days in a row", check:s=>s.gami.streak>=3},
+  {id:"streak7", icon:"🔥", title:"Week Warrior", desc:"Studied 7 days in a row", check:s=>s.gami.streak>=7},
+  {id:"level5", icon:"🏆", title:"Level 5 Scholar", desc:"Reached Level 5", check:s=>s.gami.level>=5},
+  {id:"debate_win", icon:"⚖️", title:"Courtroom Champion", desc:"Won your first AI Debate", check:s=>s.debateHistory.some(d=>d.result==='win')},
+  {id:"yuh500", icon:"🪙", title:"YUH Collector", desc:"Earned 500+ YUH total", check:s=>s.gami.totalEarned>=500},
+  {id:"planner1", icon:"📅", title:"Planner Pro", desc:"Created a study plan", check:s=>s.plans.length>=1},
+];
+
+const DEBATE_MODES = [
+  {id:"easy", label:"Easy", color:"#3fb87f", reward:50, q:20, desc:"Basic concept questions"},
+  {id:"medium", label:"Medium", color:"#5b8def", reward:100, q:20, desc:"Applied understanding"},
+  {id:"hard", label:"Hard", color:"#e8b339", reward:150, q:20, desc:"Tricky, multi-step reasoning"},
+  {id:"veryhard", label:"Very Hard", color:"#e0566b", reward:200, q:20, desc:"Expert-level, competitive intensity"},
+];
+
+/* ---------- GLOBAL STATE ---------- */
+let S = {
+  booted:false,
+  screen:"landing",
+  profile:null,
+  chapters:[],
+  activeChapterId:null,
+  studyContent:{},
+  gami:{ yuh:0, xp:0, level:1, streak:0, lastLogin:null, totalEarned:0 },
+  achievementsUnlocked:[],
+  testHistory:[],
+  generatedTests:{},
+  debateHistory:[],
+  plans:[],
+  todayTasks:[],
+  _tmp:{}
+};
+
+function countContent(s, key){
+  let c=0;
+  Object.values(s.studyContent||{}).forEach(v=>{ if(v && v[key] && (Array.isArray(v[key])? v[key].length: true)) c++; });
+  return c;
+}
+
+/* ---------- STORAGE LAYER (per-user, private — plain browser localStorage so it works on any host) ---------- */
+const STORE_KEYS = {
+  profile:"pinnacle:profile",
+  chapters:"pinnacle:chapters",
+  gami:"pinnacle:gami",
+  content:"pinnacle:study-content",
+  tests:"pinnacle:test-data",
+  debate:"pinnacle:debate-data",
+  plans:"pinnacle:plan-data",
+  achievements:"pinnacle:achievements"
+};
+
+async function storeGet(key){
+  try{
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : null;
+  }catch(e){ return null; }
+}
+async function storeSet(key, value){
+  try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){ console.error("storage set failed", e); }
+}
+
+async function loadAll(){
+  const [profile, chapters, gami, content, tests, debate, plans, ach] = await Promise.all([
+    storeGet(STORE_KEYS.profile), storeGet(STORE_KEYS.chapters), storeGet(STORE_KEYS.gami),
+    storeGet(STORE_KEYS.content), storeGet(STORE_KEYS.tests), storeGet(STORE_KEYS.debate),
+    storeGet(STORE_KEYS.plans), storeGet(STORE_KEYS.achievements)
+  ]);
+  S.profile = profile;
+  S.chapters = chapters || [];
+  S.gami = gami || { yuh:0, xp:0, level:1, streak:0, lastLogin:null, totalEarned:0 };
+  S.studyContent = content || {};
+  S.testHistory = (tests && tests.history) || [];
+  S.generatedTests = (tests && tests.sets) || {};
+  S.debateHistory = (debate && debate.history) || [];
+  S.plans = plans || [];
+  S.achievementsUnlocked = ach || [];
+}
+function persistProfile(){ return storeSet(STORE_KEYS.profile, S.profile); }
+function persistChapters(){ return storeSet(STORE_KEYS.chapters, S.chapters); }
+function persistGami(){ return storeSet(STORE_KEYS.gami, S.gami); }
+function persistContent(){ return storeSet(STORE_KEYS.content, S.studyContent); }
+function persistTests(){ return storeSet(STORE_KEYS.tests, {history:S.testHistory, sets:S.generatedTests}); }
+function persistDebate(){ return storeSet(STORE_KEYS.debate, {history:S.debateHistory}); }
+function persistPlans(){ return storeSet(STORE_KEYS.plans, S.plans); }
+function persistAchievements(){ return storeSet(STORE_KEYS.achievements, S.achievementsUnlocked); }
+
+/* ---------- THEME ---------- */
+function applyTheme(){
+  document.body.setAttribute('data-theme', (S.profile && S.profile.theme) || 'light');
+}
+function toggleTheme(){
+  if(!S.profile) return;
+  S.profile.theme = S.profile.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(); persistProfile(); render();
+}
+
+/* ---------- GAMIFICATION ENGINE ---------- */
+function xpForLevel(level){ return level*1000; }
+
+async function grantYuh(amount, label, opts){
+  opts = opts || {};
+  const before = S.gami.level;
+  S.gami.yuh = Math.max(0, S.gami.yuh + amount);
+  if(amount>0){ S.gami.xp += amount; S.gami.totalEarned += amount; }
+  while(S.gami.xp >= xpForLevel(S.gami.level)){
+    S.gami.xp -= xpForLevel(S.gami.level);
+    S.gami.level += 1;
+  }
+  await persistGami();
+  if(!opts.silent) showRewardPop(amount, label);
+  if(S.gami.level > before && !opts.silent) showLevelUp(S.gami.level);
+  await checkAchievements();
+  return S.gami;
+}
+
+async function touchStreak(){
+  const today = new Date().toISOString().slice(0,10);
+  if(S.gami.lastLogin === today) return;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  const yesterday = y.toISOString().slice(0,10);
+  if(S.gami.lastLogin === yesterday){ S.gami.streak += 1; } else { S.gami.streak = 1; }
+  S.gami.lastLogin = today;
+  await persistGami();
+  await grantYuh(5, "Daily Login", {silent:false});
+}
+
+async function checkAchievements(){
+  let unlocked = false;
+  for(const a of ACHIEVEMENT_DEFS){
+    if(!S.achievementsUnlocked.includes(a.id) && a.check(S)){
+      S.achievementsUnlocked.push(a.id);
+      unlocked = true;
+      showAchievementToast(a);
+    }
+  }
+  if(unlocked) await persistAchievements();
+}
+
+/* ---------- TOASTS / REWARD ANIMATIONS ---------- */
+function showRewardPop(amount, label){
+  const layer = document.getElementById('toastLayer');
+  const pop = document.createElement('div');
+  pop.className = 'reward-pop';
+  const sign = amount>=0 ? '+' : '';
+  pop.innerHTML = `<div class="rcoin">${amount>=0?'🪙':'💔'}</div><div class="ramt" style="color:${amount>=0?'var(--gold-deep)':'var(--red)'}">${sign}${amount} YUH</div><div class="rlbl">${label}</div>`;
+  layer.appendChild(pop);
+  if(amount>0) burstConfetti();
+  try{ if(navigator.vibrate) navigator.vibrate(amount>=0?[20,30,20]:[40]); }catch(e){}
+  playChime(amount>=0);
+  setTimeout(()=>pop.remove(), 2400);
+}
+function showAchievementToast(a){
+  const layer = document.getElementById('toastLayer');
+  const pop = document.createElement('div');
+  pop.className = 'reward-pop';
+  pop.style.top = '150px';
+  pop.style.borderColor = 'var(--purple-400)';
+  pop.innerHTML = `<div class="rcoin">${a.icon}</div><div class="ramt" style="color:var(--purple-600); font-size:15px;">Achievement Unlocked</div><div class="rlbl">${a.title}</div>`;
+  layer.appendChild(pop);
+  setTimeout(()=>pop.remove(), 2400);
+}
+function showLevelUp(level){
+  const ov = document.createElement('div');
+  ov.className='levelup-overlay';
+  ov.innerHTML = `<div class="levelup-card">
+    <div style="font-size:46px;">🎉</div>
+    <h2 style="color:#fff; font-size:24px; margin:10px 0 4px;">Level Up!</h2>
+    <div style="font-size:15px; opacity:.9; margin-bottom:18px;">You've reached Level ${level}</div>
+    <button class="btn btn-block" style="background:#fff; color:var(--purple-700);" onclick="this.closest('.levelup-overlay').remove()">Continue</button>
+  </div>`;
+  document.body.appendChild(ov);
+  burstConfetti(60);
+}
+function burstConfetti(n){
+  n = n||30;
+  const colors=['#8b5fdf','#e8b339','#3fb87f','#5b8def','#e0566b'];
+  for(let i=0;i<n;i++){
+    const p = document.createElement('div');
+    p.className='confetti-piece';
+    p.style.left = Math.random()*100+'vw';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDuration = (1.6+Math.random()*1.2)+'s';
+    p.style.opacity = .9;
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 3000);
+  }
+}
+let audioCtx;
+function playChime(positive){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    o.type='sine'; o.frequency.value = positive? 880 : 220;
+    g.gain.value=0.06;
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start();
+    o.frequency.exponentialRampToValueAtTime(positive?1320:140, audioCtx.currentTime+0.18);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.3);
+    o.stop(audioCtx.currentTime+0.32);
+  }catch(e){}
+}
+
+/* ---------- ROUTER ---------- */
+function go(screen, extra){
+  S.screen = screen;
+  if(extra) Object.assign(S, extra);
+  window.scrollTo(0,0);
+  render();
+}
+function render(){
+  const app = document.getElementById('app');
+  applyTheme();
+  let html = '';
+  switch(S.screen){
+    case 'landing': html = ScreenLanding(); break;
+    case 'onboard1': html = ScreenOnboard1(); break;
+    case 'onboard2': html = ScreenOnboard2(); break;
+    case 'dashboard': html = ScreenDashboard(); break;
+    case 'study': html = ScreenStudyHub(); break;
+    case 'studyDetail': html = ScreenStudyDetail(); break;
+    case 'doubt': html = ScreenDoubtSolver(); break;
+    case 'tests': html = ScreenTestsHub(); break;
+    case 'testRunner': html = ScreenTestRunner(); break;
+    case 'oralRunner': html = ScreenOralRunner(); break;
+    case 'debateLobby': html = ScreenDebateLobby(); break;
+    case 'debateRunner': html = ScreenDebateRunner(); break;
+    case 'debateResult': html = ScreenDebateResult(); break;
+    case 'planner': html = ScreenPlanner(); break;
+    case 'progress': html = ScreenProgress(); break;
+    case 'profile': html = ScreenProfile(); break;
+    default: html = ScreenLanding();
+  }
+  const needsNav = ['dashboard','study','tests','planner','progress','profile'].includes(S.screen);
+  app.innerHTML = html + (needsNav ? BottomNav() : '');
+  afterRender();
+}
+function afterRender(){
+  if(typeof window.__afterRenderHook === 'function'){ window.__afterRenderHook(); window.__afterRenderHook=null; }
+}
+
+function BottomNav(){
+  const items = [
+    {id:'dashboard', icon:'🏠', label:'Home'},
+    {id:'study', icon:'📚', label:'Study'},
+    {id:'tests', icon:'🧪', label:'Tests'},
+    {id:'planner', icon:'📅', label:'Planner'},
+    {id:'progress', icon:'📊', label:'Progress'},
+    {id:'profile', icon:'👤', label:'Profile'},
+  ];
+  return `<div class="bottomnav">${items.map(it=>`
+    <button class="navbtn ${S.screen===it.id?'active':''}" onclick="go('${it.id}')">
+      <span class="ni">${it.icon}</span><span>${it.label}</span><span class="nav-dot"></span>
+    </button>`).join('')}</div>`;
+}
+
+function esc(str){
+  if(str===undefined||str===null) return '';
+  return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+</script>
+<script>
+/* =========================================================================
+   SCREENS: LANDING / ONBOARDING / DASHBOARD
+   ========================================================================= */
+
+function ScreenLanding(){
+  return `<div class="landing">
+    <div class="bg-blob b1"></div><div class="bg-blob b2"></div><div class="bg-blob b3"></div>
+    <div class="landing-logo">🎓</div>
+    <h1>Pinnacle <span>AI Study</span></h1>
+    <p class="tag">Learn Smarter. Level Up Faster.</p>
+    <button class="btn btn-primary" style="padding:16px 36px; font-size:16px;" onclick="go('onboard1')">👉 Start Learning</button>
+    <div class="landing-pills">
+      <div class="landing-pill">🤖 AI Tutor</div>
+      <div class="landing-pill">⚖️ AI Debate</div>
+      <div class="landing-pill">🪙 YUH Rewards</div>
+      <div class="landing-pill">🎤 Oral Exams</div>
+    </div>
+  </div>`;
+}
+
+/* ---------- ONBOARD FORM 1: STUDY PROFILE ---------- */
+function ScreenOnboard1(){
+  const t = S._tmp.form1 || {name:'', klass:'', board:'', subjects:[], language:''};
+  S._tmp.form1 = t;
+  return `<div class="scr">
+    <div class="step-dots"><div class="step-dot active"></div><div class="step-dot"></div></div>
+    <h2 style="text-align:center; margin-bottom:4px;">Set up your study profile</h2>
+    <p class="muted" style="text-align:center; font-size:13.5px; margin-bottom:22px;">This stays just between you and Pinnacle</p>
+
+    <div class="field"><label>Your Name</label>
+      <input type="text" id="f1name" placeholder="e.g. Aarav Sharma" value="${esc(t.name)}">
+    </div>
+
+    <div class="field"><label>Class / Level</label>
+      <div class="chip-group" id="f1klass">
+        ${CLASS_LIST.map(c=>`<button type="button" class="chip ${t.klass===c?'active':''}" data-val="${esc(c)}" onclick="pickChip('f1klass','${esc(c)}',false)">${c}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="field"><label>Board</label>
+      <div class="chip-group" id="f1board">
+        ${BOARD_LIST.map(c=>`<button type="button" class="chip ${t.board===c?'active':''}" data-val="${esc(c)}" onclick="pickChip('f1board','${esc(c)}',false)">${c}</button>`).join('')}
+      </div>
+    </div>
+
+    <div class="field"><label>Subjects <span class="muted">(select all that apply)</span></label>
+      ${Object.entries(SUBJECT_CATALOG).map(([cat, subs])=>`
+        <div class="chip-cat">${cat}</div>
+        <div class="chip-group" id="f1subj">
+          ${subs.map(s=>`<button type="button" class="chip ${t.subjects.includes(s)?'active':''}" data-val="${esc(s)}" onclick="pickChip('f1subj','${esc(s)}',true)">${s}</button>`).join('')}
+        </div>`).join('')}
+    </div>
+
+    <div class="field"><label>Language of Study</label>
+      <div class="chip-group" id="f1lang">
+        ${LANGUAGE_LIST.map(c=>`<button type="button" class="chip ${t.language===c?'active':''}" data-val="${esc(c)}" onclick="pickChip('f1lang','${esc(c)}',false)">${c}</button>`).join('')}
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" style="margin-top:10px;" onclick="submitForm1()">Continue →</button>
+  </div>`;
+}
+
+function pickChip(groupId, val, multi){
+  const t = S._tmp.form1;
+  const key = {f1klass:'klass', f1board:'board', f1subj:'subjects', f1lang:'language'}[groupId];
+  if(multi){
+    const idx = t.subjects.indexOf(val);
+    if(idx>-1) t.subjects.splice(idx,1); else t.subjects.push(val);
+  } else {
+    t[key] = val;
+  }
+  // re-render only the chip group + name field preserved via tmp store
+  t.name = document.getElementById('f1name') ? document.getElementById('f1name').value : t.name;
+  render();
+}
+
+function submitForm1(){
+  const t = S._tmp.form1;
+  t.name = document.getElementById('f1name').value.trim();
+  if(!t.name){ alert('Apna naam daalo yaar 🙂'); return; }
+  if(!t.klass){ alert('Class select karo'); return; }
+  if(!t.board){ alert('Board select karo'); return; }
+  if(t.subjects.length===0){ alert('Kam se kam 1 subject select karo'); return; }
+  if(!t.language){ alert('Language select karo'); return; }
+  S.profile = { name:t.name, klass:t.klass, board:t.board, subjects:t.subjects.slice(), language:t.language, theme:'light' };
+  persistProfile();
+  go('onboard2');
+}
+
+/* ---------- ONBOARD FORM 2: CHAPTER SETUP ---------- */
+function ScreenOnboard2(){
+  const t = S._tmp.form2 || {name:'', number:'', subject: (S.profile?S.profile.subjects[0]:''), image:null, refNotes:''};
+  S._tmp.form2 = t;
+  return `<div class="scr">
+    <div class="step-dots"><div class="step-dot"></div><div class="step-dot active"></div></div>
+    <h2 style="text-align:center; margin-bottom:4px;">Add your first chapter</h2>
+    <p class="muted" style="text-align:center; font-size:13.5px; margin-bottom:22px;">Try a Math chapter to explore every feature</p>
+
+    <div class="field"><label>Chapter Name</label>
+      <input type="text" id="f2name" placeholder="e.g. Quadratic Equations" value="${esc(t.name)}">
+    </div>
+    <div class="field"><label>Chapter Number</label>
+      <input type="text" id="f2num" placeholder="e.g. 4" value="${esc(t.number)}">
+    </div>
+    <div class="field"><label>Subject</label>
+      <select id="f2subject">
+        ${S.profile.subjects.map(s=>`<option value="${esc(s)}" ${t.subject===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>Chapter Image <span class="muted">(optional)</span></label>
+      <input type="file" id="f2img" accept="image/*" onchange="handleChapterImage(event)">
+      <div id="f2imgPreview" style="margin-top:8px;">${t.image?`<img src="${t.image}" style="width:100%; max-height:140px; object-fit:cover; border-radius:12px;">`:''}</div>
+    </div>
+    <div class="field"><label>Notes / Reference <span class="muted">(optional)</span></label>
+      <textarea id="f2notes" placeholder="Any reference text, page numbers, etc.">${esc(t.refNotes)}</textarea>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="submitForm2()">🚀 Launch AI Dashboard</button>
+  </div>`;
+}
+
+function handleChapterImage(ev){
+  const file = ev.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      const maxW = 480;
+      const scale = Math.min(1, maxW/img.width);
+      canvas.width = img.width*scale; canvas.height = img.height*scale;
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+      S._tmp.form2.image = dataUrl;
+      document.getElementById('f2imgPreview').innerHTML = `<img src="${dataUrl}" style="width:100%; max-height:140px; object-fit:cover; border-radius:12px;">`;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function submitForm2(){
+  const t = S._tmp.form2;
+  t.name = document.getElementById('f2name').value.trim();
+  t.number = document.getElementById('f2num').value.trim();
+  t.subject = document.getElementById('f2subject').value;
+  t.refNotes = document.getElementById('f2notes').value.trim();
+  if(!t.name){ alert('Chapter ka naam daalo'); return; }
+  const chapter = { id:uid(), name:t.name, number:t.number, subject:t.subject, image:t.image||null, refNotes:t.refNotes||'' };
+  S.chapters.push(chapter);
+  S.activeChapterId = chapter.id;
+  await persistChapters();
+  await touchStreak();
+  await checkAchievements();
+  S._tmp.form1=null; S._tmp.form2=null;
+  go('dashboard');
+}
+
+/* ---------- DASHBOARD ---------- */
+function weeklyProgressPercent(){
+  const since = Date.now() - 7*24*3600*1000;
+  let count = 0;
+  S.testHistory.forEach(t=>{ if(new Date(t.date).getTime()>since) count++; });
+  S.debateHistory.forEach(d=>{ if(new Date(d.date).getTime()>since) count++; });
+  count += Math.min(5, S.chapters.length);
+  return Math.min(100, Math.round((count/10)*100));
+}
+
+function progressRing(percent, size, stroke){
+  size = size||64; stroke = stroke||6;
+  const r = (size-stroke)/2;
+  const c = 2*Math.PI*r;
+  const offset = c - (Math.min(100,Math.max(0,percent))/100)*c;
+  return `<div style="position:relative; width:${size}px; height:${size}px; flex:none;">
+    <svg class="ring-svg" width="${size}" height="${size}">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="var(--grey-100)" stroke-width="${stroke}" fill="none"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="var(--purple-500)" stroke-width="${stroke}" fill="none"
+        stroke-dasharray="${c}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+    </svg>
+    <div class="ring-center-label">${percent}%</div>
+  </div>`;
+}
+
+function ScreenDashboard(){
+  if(!S.profile) { go('landing'); return ''; }
+  const g = S.gami;
+  const xpPct = Math.min(100, Math.round((g.xp / xpForLevel(g.level))*100));
+  const initials = S.profile.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const wp = weeklyProgressPercent();
+  const recentChapters = S.chapters.slice(-3).reverse();
+  const recentAch = S.achievementsUnlocked.slice(-3).reverse().map(id=>ACHIEVEMENT_DEFS.find(a=>a.id===id)).filter(Boolean);
+  const upcomingTests = S.testHistory.length;
+
+  return `<div class="scr" style="padding-top:16px;">
+    <div class="row between" style="margin-bottom:14px;">
+      <div>
+        <div style="font-size:13px; color:var(--grey-500);">Welcome back,</div>
+        <div style="font-size:19px; font-weight:800;">${esc(S.profile.name.split(' ')[0])} 👋</div>
+      </div>
+      <button class="icon-btn" onclick="go('profile')">⚙️</button>
+    </div>
+
+    <div class="profile-card">
+      <div class="row between" style="position:relative; z-index:1;">
+        <div class="row gap-12">
+          <div class="avatar">${initials}</div>
+          <div>
+            <div style="font-weight:800; font-size:16px;">${esc(S.profile.name)}</div>
+            <div class="level-badge">⭐ Level ${g.level}</div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px; opacity:.8;">YUH Balance</div>
+          <div style="font-size:21px; font-weight:800;">🪙 ${g.yuh}</div>
+        </div>
+      </div>
+      <div class="xp-track"><div class="xp-fill" style="width:${xpPct}%"></div></div>
+      <div style="font-size:11px; opacity:.85; margin-top:5px;">${g.xp} / ${xpForLevel(g.level)} XP to next level</div>
+      <div class="stat-row">
+        <div class="stat-mini"><div class="v">🔥 ${g.streak}</div><div class="l">Day Streak</div></div>
+        <div class="stat-mini"><div class="v">${S.chapters.length}</div><div class="l">Chapters</div></div>
+        <div class="stat-mini"><div class="v">${wp}%</div><div class="l">Weekly Goal</div></div>
+      </div>
+    </div>
+
+    <div class="card ring-card" style="margin-top:14px;">
+      ${progressRing(wp, 64, 7)}
+      <div style="flex:1;">
+        <div style="font-weight:700; font-size:14px;">Weekly Progress Ring</div>
+        <div class="muted" style="font-size:12px;">${wp>=100?'Goal smashed! 🎉':wp>=60?'Almost there — keep going!':'Study, test or debate to fill the ring'}</div>
+      </div>
+    </div>
+
+    <div class="section-title">Quick Actions</div>
+    <div class="quick-grid">
+      <div class="quick-card" onclick="go('study')"><div class="qi">📚</div><div class="qt">Continue Learning</div><div class="qs">${S.chapters.length} chapter${S.chapters.length===1?'':'s'} ready</div></div>
+      <div class="quick-card" onclick="openDebateLobby()"><div class="qi">⚖️</div><div class="qt">AI Debate</div><div class="qs">Challenge the judge</div></div>
+      <div class="quick-card" onclick="go('tests')"><div class="qi">🧪</div><div class="qt">Take a Test</div><div class="qs">${upcomingTests} attempted</div></div>
+      <div class="quick-card" onclick="go('planner')"><div class="qi">📅</div><div class="qt">Smart Planner</div><div class="qs">${S.plans.length} active plan${S.plans.length===1?'':'s'}</div></div>
+    </div>
+
+    <div class="section-title">Today's Tasks</div>
+    ${recentChapters.length===0 ? `<div class="card" style="text-align:center; color:var(--grey-500); font-size:13.5px;">Add a chapter from Study tab to get tasks here</div>` :
+      recentChapters.map(c=>`<div class="task-item">
+        <div class="task-check">📖</div>
+        <div style="flex:1;"><div style="font-weight:600; font-size:13.5px;">Review "${esc(c.name)}"</div><div class="muted" style="font-size:11.5px;">${esc(c.subject)}</div></div>
+        <button class="btn btn-sm btn-ghost" onclick="openChapter('${c.id}')">Open</button>
+      </div>`).join('')
+    }
+
+    <div class="section-title">Recent Achievements</div>
+    ${recentAch.length===0 ? `<div class="card" style="text-align:center; color:var(--grey-500); font-size:13.5px;">No achievements yet — start studying to earn your first 🏆</div>` :
+      recentAch.map(a=>`<div class="achv"><div class="ai">${a.icon}</div><div><div style="font-weight:700; font-size:13px;">${a.title}</div><div class="muted" style="font-size:11px;">${a.desc}</div></div></div>`).join('')
+    }
+  </div>`;
+}
+
+function openDebateLobby(){ go('debateLobby'); }
+function openChapter(id){ S.activeChapterId = id; go('study'); }
+</script>
+
+<script>
+/* =========================================================================
+   AI ENGINE — calls our own /api/ai backend (which talks to OpenAI server-side)
+   ========================================================================= */
+/* ---------- request pacing + auto-retry (handles platform rate limits gracefully) ---------- */
+let __aiLastCallAt = 0;
+const __AI_MIN_GAP_MS = 450; // small gap between calls so rapid feature use doesn't burst the rate limit
+
+async function __aiThrottle(){
+  const wait = __aiLastCallAt + __AI_MIN_GAP_MS - Date.now();
+  if(wait > 0) await new Promise(r=>setTimeout(r, wait));
+  __aiLastCallAt = Date.now();
+}
+function __setAIStatus(text){
+  const el = document.getElementById('aiStatusText');
+  if(el) el.textContent = text;
+}
+
+async function __callBackendAI(messages, maxTokens, _retryCount){
+  _retryCount = _retryCount || 0;
+  await __aiThrottle();
+  let res, data;
+  try{
+    res = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: messages, maxTokens: maxTokens || 1000 })
+    });
+    try{ data = await res.json(); }catch(e){ data = null; }
+  }catch(networkErr){
+    if(_retryCount < 4){
+      __setAIStatus(`Connection issue — retrying (${_retryCount+1}/4)...`);
+      await new Promise(r=>setTimeout(r, 800 * Math.pow(2,_retryCount)));
+      return __callBackendAI(messages, maxTokens, _retryCount+1);
+    }
+    throw new Error("Network problem — please check your connection and try again.");
+  }
+
+  const isRateLimited = res.status === 429;
+  const isServerHiccup = res.status >= 500;
+
+  if((isRateLimited || isServerHiccup) && _retryCount < 4){
+    const retryAfter = res.headers.get && res.headers.get('retry-after');
+    const backoff = retryAfter ? parseFloat(retryAfter)*1000 : Math.min(9000, 700 * Math.pow(2, _retryCount)) + Math.random()*350;
+    __setAIStatus(isRateLimited ? `AI is a bit busy right now — retrying automatically (${_retryCount+1}/4)...` : `Server hiccup — retrying (${_retryCount+1}/4)...`);
+    await new Promise(r=>setTimeout(r, backoff));
+    return __callBackendAI(messages, maxTokens, _retryCount+1);
+  }
+
+  if(!data) throw new Error("Couldn't reach the AI server. Please try again.");
+  if(data.error){
+    if(isRateLimited) throw new Error("AI is handling a lot of requests right now.");
+    throw new Error(data.error || 'AI request failed');
+  }
+  return (data.text || '').trim();
+}
+
+/* ---------- optional backup AI (Gemini) — only used if the user adds their own free key in Profile ---------- */
+function __extractPromptForFallback(messages){
+  const content = messages[0] && messages[0].content;
+  if(typeof content === 'string') return {text: content, image:null};
+  if(Array.isArray(content)){
+    let text = '', image = null;
+    content.forEach(b=>{
+      if(b.type==='text') text += (text?'\n':'') + b.text;
+      if(b.type==='image' && b.source) image = {mediaType:b.source.media_type, data:b.source.data};
+    });
+    return {text, image};
+  }
+  return {text:String(content||''), image:null};
+}
+async function callGeminiFallback(messages, maxTokens){
+  const key = S.profile && S.profile.geminiKey;
+  if(!key) return null;
+  const {text, image} = __extractPromptForFallback(messages);
+  const parts = [{text}];
+  if(image) parts.push({inline_data:{mime_type:image.mediaType, data:image.data}});
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ contents:[{parts}], generationConfig:{maxOutputTokens: maxTokens||1000} })
+  });
+  let data; try{ data = await res.json(); }catch(e){ throw new Error('Backup AI (Gemini) did not respond.'); }
+  if(data.error) throw new Error(data.error.message || 'Backup AI (Gemini) request failed');
+  const out = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts
+    ? data.candidates[0].content.parts.map(p=>p.text||'').join('\n').trim() : '';
+  if(!out) throw new Error('Backup AI (Gemini) returned an empty response.');
+  return out;
+}
+
+async function callAIRaw(messages, maxTokens){
+  try{
+    return await __callBackendAI(messages, maxTokens, 0);
+  }catch(primaryErr){
+    if(S.profile && S.profile.geminiKey){
+      try{
+        __setAIStatus("Primary AI is busy — switching to your backup AI key...");
+        const fallbackText = await callGeminiFallback(messages, maxTokens);
+        if(fallbackText) return fallbackText;
+      }catch(fallbackErr){
+        throw new Error(`${primaryErr.message} Backup AI also failed: ${fallbackErr.message}`);
+      }
+    }
+    throw primaryErr;
+  }
+}
+
+async function callAIText(systemPrompt, userPrompt, maxTokens){
+  const combined = `${systemPrompt}\n\n${userPrompt}`;
+  return await callAIRaw([{role:'user', content: combined}], maxTokens);
+}
+
+function stripJsonFence(text){
+  let t = text.trim();
+  t = t.replace(/^```json/i,'').replace(/^```/,'').replace(/```$/,'').trim();
+  const firstBrace = Math.min(...['[','{'].map(c=>{const i=t.indexOf(c); return i===-1?Infinity:i;}));
+  if(firstBrace!==Infinity && firstBrace>0) t = t.slice(firstBrace);
+  return t;
+}
+
+async function callAIJson(systemPrompt, userPrompt, maxTokens){
+  const sys = systemPrompt + "\n\nCRITICAL: Respond with ONLY valid raw JSON. No markdown fences, no preamble, no explanation — just the JSON value itself.";
+  const text = await callAIText(sys, userPrompt, maxTokens);
+  const cleaned = stripJsonFence(text);
+  try{ return JSON.parse(cleaned); }
+  catch(e){
+    // retry once asking it to fix
+    try{
+      const fixed = await callAIText("Fix this into strictly valid JSON only, no other text:", cleaned, maxTokens);
+      return JSON.parse(stripJsonFence(fixed));
+    }catch(e2){ throw new Error('AI returned invalid data. Please try again.'); }
+  }
+}
+
+async function callAIVision(systemPrompt, userPrompt, imageBase64DataUrl, maxTokens){
+  const match = imageBase64DataUrl.match(/^data:(image\/\w+);base64,(.*)$/);
+  const mediaType = match ? match[1] : 'image/jpeg';
+  const data = match ? match[2] : imageBase64DataUrl;
+  const content = [
+    { type:'image', source:{ type:'base64', media_type: mediaType, data: data } },
+    { type:'text', text: `${systemPrompt}\n\n${userPrompt}` }
+  ];
+  return await callAIRaw([{role:'user', content}], maxTokens);
+}
+
+function chapterCtx(c){
+  const p = S.profile;
+  return `Student level: ${p.klass}, Board: ${p.board}. Subject: ${c.subject}. Chapter ${c.number?('#'+c.number+' '):''}"${c.name}". ${c.refNotes?('Extra reference from student: '+c.refNotes):''} Respond primarily in ${p.language==='Hinglish'?'Hinglish (Roman Hindi mixed with English, casual student tone)':p.language}. Keep it accurate, age-appropriate, and exam-relevant.`;
+}
+</script>
+
+<script>
+/* =========================================================================
+   STUDY MODULE
+   ========================================================================= */
+const STUDY_TABS = [
+  {id:'summary', icon:'📖', title:'Summary', sub:'Chapter overview'},
+  {id:'notes', icon:'📝', title:'Notes', sub:'Key study notes'},
+  {id:'concepts', icon:'🧠', title:'Concepts', sub:'Beginner & advanced'},
+  {id:'definitions', icon:'📕', title:'Definitions', sub:'Glossary terms'},
+  {id:'formulas', icon:'📊', title:'Formula Sheet', sub:'Quick reference'},
+  {id:'flashcards', icon:'🔁', title:'Flashcards', sub:'Swipe to learn'},
+];
+const TAB_COLORS = {summary:'#8b5fdf', notes:'#5b8def', concepts:'#3fb87f', definitions:'#e8b339', formulas:'#e0566b', flashcards:'#7445cf'};
+
+function ScreenStudyHub(){
+  if(!S.activeChapterId && S.chapters.length) S.activeChapterId = S.chapters[S.chapters.length-1].id;
+  const active = S.chapters.find(c=>c.id===S.activeChapterId);
+
+  if(S.chapters.length===0){
+    return `<div class="topbar"><h2>Study</h2></div>
+    <div class="scr">
+      <div class="empty-state"><div class="ei">📚</div><div style="font-weight:700; margin-bottom:6px;">No chapters yet</div>
+      <p style="font-size:13.5px; margin-bottom:18px;">Add your first chapter to unlock notes, tests, flashcards and more.</p>
+      <button class="btn btn-primary" onclick="openAddChapterModal()">+ Add Chapter</button></div>
+    </div>`;
+  }
+
+  return `<div class="topbar"><h2>Study</h2><button class="icon-btn" onclick="openAddChapterModal()">➕</button></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="chip-group" style="margin-bottom:16px;">
+      ${S.chapters.map(c=>`<button class="chip ${c.id===S.activeChapterId?'active':''}" onclick="selectChapter('${c.id}')">${esc(c.name)}</button>`).join('')}
+    </div>
+
+    <div class="card glass" style="margin-bottom:16px;">
+      <div class="row gap-12">
+        ${active.image?`<img src="${active.image}" style="width:54px;height:54px;border-radius:14px;object-fit:cover;">`:`<div style="width:54px;height:54px;border-radius:14px;background:var(--purple-100);display:flex;align-items:center;justify-content:center;font-size:24px;">📖</div>`}
+        <div style="flex:1;">
+          <div style="font-weight:800; font-size:15.5px;">${esc(active.name)}</div>
+          <div class="muted" style="font-size:12px;">${esc(active.subject)} ${active.number?'• Ch '+esc(active.number):''}</div>
+        </div>
+        <span class="tag-pill">${esc(S.profile.klass)}</span>
+      </div>
+    </div>
+
+    <div class="section-title">Study Tools</div>
+    <div class="feat-grid">
+      ${STUDY_TABS.map(t=>{
+        const has = S.studyContent[active.id] && S.studyContent[active.id][t.id] && (Array.isArray(S.studyContent[active.id][t.id]) ? S.studyContent[active.id][t.id].length>0 : true);
+        return `<div class="feat-card" onclick="go('studyDetail',{_tab:'${t.id}'})">
+          ${has?'<div class="feat-badge">✓ Ready</div>':''}
+          <div class="fi" style="background:${TAB_COLORS[t.id]}1a; color:${TAB_COLORS[t.id]};">${t.icon}</div>
+          <div class="ft">${t.title}</div>
+          <div class="fs">${t.sub}</div>
+        </div>`;
+      }).join('')}
+      <div class="feat-card" onclick="go('doubt')" style="grid-column:1 / -1; flex-direction:row; align-items:center;">
+        <div class="fi" style="background:#8b5fdf1a; color:#8b5fdf;">🤖</div>
+        <div><div class="ft">AI Doubt Solver</div><div class="fs">Ask via text, voice, or photo</div></div>
+      </div>
+    </div>
+  </div>
+  ${S._tmp.addChapterOpen ? AddChapterModal() : ''}`;
+}
+
+function selectChapter(id){ S.activeChapterId = id; render(); }
+
+function openAddChapterModal(){
+  S._tmp.addChapterOpen = true;
+  S._tmp.newChapter = {name:'', number:'', subject:S.profile.subjects[0], image:null, refNotes:''};
+  render();
+}
+function closeAddChapterModal(){ S._tmp.addChapterOpen=false; render(); }
+function AddChapterModal(){
+  const t = S._tmp.newChapter;
+  return `<div class="modal-bg" onclick="if(event.target===this) closeAddChapterModal()">
+    <div class="modal-sheet">
+      <div class="sheet-handle"></div>
+      <h3 style="margin-bottom:14px;">Add New Chapter</h3>
+      <div class="field"><label>Chapter Name</label><input type="text" id="ncName" value="${esc(t.name)}" placeholder="e.g. Photosynthesis"></div>
+      <div class="field"><label>Chapter Number</label><input type="text" id="ncNum" value="${esc(t.number)}" placeholder="e.g. 6"></div>
+      <div class="field"><label>Subject</label><select id="ncSubject">${S.profile.subjects.map(s=>`<option ${t.subject===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="field"><label>Notes / Reference <span class="muted">(optional)</span></label><textarea id="ncNotes" placeholder="Optional reference">${esc(t.refNotes)}</textarea></div>
+      <button class="btn btn-primary btn-block" onclick="confirmAddChapter()">Add Chapter</button>
+    </div>
+  </div>`;
+}
+async function confirmAddChapter(){
+  const name = document.getElementById('ncName').value.trim();
+  if(!name){ alert('Chapter name daalo'); return; }
+  const chapter = { id:uid(), name, number:document.getElementById('ncNum').value.trim(), subject:document.getElementById('ncSubject').value, image:null, refNotes:document.getElementById('ncNotes').value.trim() };
+  S.chapters.push(chapter);
+  S.activeChapterId = chapter.id;
+  await persistChapters();
+  await checkAchievements();
+  S._tmp.addChapterOpen = false;
+  render();
+}
+
+/* ---------- STUDY DETAIL (tabbed AI content) ---------- */
+function ScreenStudyDetail(){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const tab = S._tab || 'summary';
+  const tabDef = STUDY_TABS.find(t=>t.id===tab);
+  const content = S.studyContent[c.id] || {};
+
+  return `<div class="topbar"><button class="back-btn" onclick="go('study')">←</button><h2>${tabDef.title}</h2><div style="width:38px;"></div></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="muted" style="font-size:12.5px; margin-bottom:14px;">${esc(c.subject)} · ${esc(c.name)}</div>
+    <div class="chip-group" style="margin-bottom:16px;">
+      ${STUDY_TABS.map(t=>`<button class="chip ${t.id===tab?'active':''}" onclick="go('studyDetail',{_tab:'${t.id}'})">${t.icon} ${t.title}</button>`).join('')}
+    </div>
+    <div id="studyContentArea">${renderStudyTabContent(c, tab, content)}</div>
+  </div>`;
+}
+
+function renderStudyTabContent(c, tab, content){
+  if(tab==='summary') return renderSummaryTab(c, content);
+  if(tab==='notes') return renderNotesTab(c, content);
+  if(tab==='concepts') return renderConceptsTab(c, content);
+  if(tab==='definitions') return renderDefinitionsTab(c, content);
+  if(tab==='formulas') return renderFormulasTab(c, content);
+  if(tab==='flashcards') return renderFlashcardsTab(c, content);
+  return '';
+}
+
+function genBtn(label, onclick){
+  return `<div class="empty-state"><div class="ei">✨</div><p style="margin-bottom:16px;">${label}</p>
+    <button class="btn btn-primary" onclick="${onclick}">Generate with AI</button></div>`;
+}
+function loadingBlock(){
+  return `<div class="ai-loading"><div class="spinner"></div><div class="muted" id="aiStatusText" style="font-size:13.5px;">AI is thinking...</div></div>`;
+}
+async function runGen(fn){
+  document.getElementById('studyContentArea').innerHTML = loadingBlock();
+  try{ await fn(); render(); }
+  catch(e){ document.getElementById('studyContentArea').innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><p>${esc(e.message)}</p><button class="btn btn-secondary" onclick="render()">Back</button></div>`; }
+}
+
+/* SUMMARY */
+function renderSummaryTab(c, content){
+  if(!content.summary) return genBtn('Get an AI-generated overview of this chapter.', `runGen(genSummary)`);
+  return `<div class="card content-block"><div class="ai-bubble">${esc(content.summary).replace(/\n/g,'<br>')}</div></div>
+    <button class="btn btn-secondary btn-sm" onclick="runGen(genSummary)">↻ Regenerate</button>`;
+}
+async function genSummary(){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const text = await callAIText("You are an expert teacher writing a concise chapter summary for a student.", `${chapterCtx(c)}\n\nWrite a clear 150-200 word summary of this chapter covering the main ideas a student must know.`, 500);
+  S.studyContent[c.id] = S.studyContent[c.id] || {};
+  S.studyContent[c.id].summary = text;
+  await persistContent();
+  await grantYuh(5, "Summary Generated");
+}
+
+/* NOTES */
+function renderNotesTab(c, content){
+  if(!content.notes) return genBtn('Generate quick exam-ready notes.', `runGen(genNotes)`);
+  return `<div class="card content-block"><div class="ai-bubble">${esc(content.notes).replace(/\n/g,'<br>')}</div></div>
+    <button class="btn btn-secondary btn-sm" onclick="runGen(genNotes)">↻ Regenerate</button>`;
+}
+async function genNotes(){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const text = await callAIText("You are a top student creating crisp bullet-point revision notes.", `${chapterCtx(c)}\n\nGenerate well-structured bullet-point notes (use • for bullets, group under short bold-ish headings using CAPS) covering all key points for fast exam revision.`, 700);
+  S.studyContent[c.id] = S.studyContent[c.id] || {};
+  S.studyContent[c.id].notes = text;
+  await persistContent();
+  await grantYuh(10, "Notes Created");
+}
+
+/* CONCEPTS */
+function renderConceptsTab(c, content){
+  const mode = S._tmp.conceptMode || 'beginner';
+  const key = mode==='beginner' ? 'concepts_beg' : 'concepts_adv';
+  const body = content[key]
+    ? `<div class="card content-block"><div class="ai-bubble">${esc(content[key]).replace(/\n/g,'<br>')}</div></div><button class="btn btn-secondary btn-sm" onclick="runGen(()=>genConcepts('${mode}'))">↻ Regenerate</button>`
+    : genBtn(`Explain this chapter in ${mode} mode.`, `runGen(()=>genConcepts('${mode}'))`);
+  return `<div class="toggle-row">
+    <button class="${mode==='beginner'?'active':''}" onclick="setConceptMode('beginner')">🌱 Beginner</button>
+    <button class="${mode==='advanced'?'active':''}" onclick="setConceptMode('advanced')">🚀 Advanced</button>
+  </div>${body}`;
+}
+function setConceptMode(m){ S._tmp.conceptMode = m; render(); }
+async function genConcepts(mode){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const level = mode==='beginner' ? 'Explain like the student is seeing this topic for the first time — simple words, relatable analogies, step by step.' : 'Explain at an advanced, exam-competitive depth — include nuances, edge cases, and how examiners twist questions on this topic.';
+  const text = await callAIText("You are an expert concept teacher.", `${chapterCtx(c)}\n\n${level}\nKeep it to 180-250 words.`, 600);
+  S.studyContent[c.id] = S.studyContent[c.id] || {};
+  S.studyContent[c.id][mode==='beginner'?'concepts_beg':'concepts_adv'] = text;
+  await persistContent();
+  await grantYuh(5, "Concept Unlocked");
+}
+
+/* DEFINITIONS */
+function renderDefinitionsTab(c, content){
+  if(!content.definitions || !content.definitions.length) return genBtn('Build a searchable glossary for this chapter.', `runGen(genDefinitions)`);
+  return `<input type="text" placeholder="🔍 Search terms..." style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid var(--grey-200); background:var(--grey-50); margin-bottom:12px;" oninput="filterDefs(this.value)">
+    <div id="defsList">${content.definitions.map((d,i)=>`<div class="card content-block def-item" data-term="${esc(d.term.toLowerCase())}"><div style="font-weight:700; color:var(--purple-700); margin-bottom:4px;">${esc(d.term)}</div><div style="font-size:13.5px; color:var(--grey-700);">${esc(d.definition)}</div></div>`).join('')}</div>
+    <button class="btn btn-secondary btn-sm" onclick="runGen(genDefinitions)">↻ Regenerate</button>`;
+}
+function filterDefs(q){
+  q = q.toLowerCase();
+  document.querySelectorAll('.def-item').forEach(el=>{ el.style.display = el.dataset.term.includes(q) ? '' : 'none'; });
+}
+async function genDefinitions(){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const data = await callAIJson("You are building a glossary for students.", `${chapterCtx(c)}\n\nReturn a JSON array of 8-12 important terms from this chapter as [{"term":"...", "definition":"..."}]. Definitions must be short (max 25 words) and clear.`, 900);
+  S.studyContent[c.id] = S.studyContent[c.id] || {};
+  S.studyContent[c.id].definitions = Array.isArray(data) ? data : [];
+  await persistContent();
+  await grantYuh(5, "Glossary Built");
+}
+
+/* FORMULA SHEET */
+function renderFormulasTab(c, content){
+  if(!content.formulas || !content.formulas.length) return genBtn('Generate a quick-reference formula sheet.', `runGen(genFormulas)`);
+  return content.formulas.map(f=>`<div class="card content-block">
+      <div style="font-family:var(--font-mono); font-weight:700; color:var(--purple-700); font-size:15px; margin-bottom:5px;">${esc(f.formula)}</div>
+      <div style="font-weight:600; font-size:13px; margin-bottom:3px;">${esc(f.name)}</div>
+      <div class="muted" style="font-size:12px;">${esc(f.usage)}</div>
+    </div>`).join('') + `<button class="btn btn-secondary btn-sm" onclick="runGen(genFormulas)">↻ Regenerate</button>`;
+}
+async function genFormulas(){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const data = await callAIJson("You are building a formula / key-framework reference sheet.", `${chapterCtx(c)}\n\nReturn a JSON array [{"name":"...", "formula":"...", "usage":"one-line note on when/how to use it"}] with 5-10 of the most important formulas or key frameworks for this chapter. If this subject genuinely has no formulas (e.g. literature), instead return key frameworks/structures students should memorize in the same JSON shape.`, 900);
+  S.studyContent[c.id] = S.studyContent[c.id] || {};
+  S.studyContent[c.id].formulas = Array.isArray(data) ? data : [];
+  await persistContent();
+  await grantYuh(25, "Formula Sheet Ready");
+}
+
+/* FLASHCARDS */
+function renderFlashcardsTab(c, content){
+  if(!content.flashcards || !content.flashcards.length) return genBtn('Auto-generate flip flashcards for this chapter.', `runGen(genFlashcards)`);
+  const idx = S._tmp.flashIdx || 0;
+  const card = content.flashcards[idx];
+  return `<div class="muted" style="text-align:center; font-size:12.5px; margin-bottom:6px;">Card ${idx+1} of ${content.flashcards.length} · tap to flip</div>
+    <div class="flash-stage"><div class="flash-card ${S._tmp.flashFlipped?'flipped':''}" onclick="flipFlash()">
+      <div class="flash-face flash-front">${esc(card.front)}</div>
+      <div class="flash-face flash-back">${esc(card.back)}</div>
+    </div></div>
+    <div class="row gap-12" style="margin-top:14px;">
+      <button class="btn btn-secondary" style="flex:1;" onclick="navFlash(-1)">← Prev</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="navFlash(1)">Next →</button>
+    </div>
+    <button class="btn btn-secondary btn-sm" style="margin-top:10px;" onclick="runGen(genFlashcards)">↻ Regenerate Set</button>`;
+}
+function flipFlash(){ S._tmp.flashFlipped = !S._tmp.flashFlipped; render(); }
+function navFlash(dir){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const len = S.studyContent[c.id].flashcards.length;
+  S._tmp.flashIdx = ((S._tmp.flashIdx||0) + dir + len) % len;
+  S._tmp.flashFlipped = false;
+  render();
+}
+async function genFlashcards(){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const data = await callAIJson("You are creating spaced-repetition flashcards.", `${chapterCtx(c)}\n\nReturn a JSON array of 10 flashcards [{"front":"question or term","back":"concise answer"}] covering this chapter.`, 900);
+  S.studyContent[c.id] = S.studyContent[c.id] || {};
+  S.studyContent[c.id].flashcards = Array.isArray(data) ? data : [];
+  S._tmp.flashIdx = 0; S._tmp.flashFlipped = false;
+  await persistContent();
+  await grantYuh(10, "Flashcards Ready");
+}
+</script>
+
+<script>
+/* =========================================================================
+   AI DOUBT SOLVER
+   ========================================================================= */
+function ScreenDoubtSolver(){
+  S._tmp.doubt = S._tmp.doubt || {mode:'text', history:[], image:null};
+  const d = S._tmp.doubt;
+  return `<div class="topbar"><button class="back-btn" onclick="go('study')">←</button><h2>AI Doubt Solver</h2><div style="width:38px;"></div></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="toggle-row">
+      <button class="${d.mode==='text'?'active':''}" onclick="setDoubtMode('text')">⌨️ Text</button>
+      <button class="${d.mode==='voice'?'active':''}" onclick="setDoubtMode('voice')">🎤 Voice</button>
+      <button class="${d.mode==='image'?'active':''}" onclick="setDoubtMode('image')">📷 Image</button>
+    </div>
+
+    <div id="doubtHistory">${d.history.map(h=>`
+      <div class="card content-block" style="background:var(--purple-50); border:none;"><div style="font-weight:700; font-size:12px; color:var(--purple-600); margin-bottom:4px;">YOU ASKED</div>${h.img?`<img src="${h.img}" style="max-width:140px;border-radius:10px;margin-bottom:6px;">`:''}<div style="font-size:13.5px;">${esc(h.q)}</div></div>
+      <div class="card content-block"><div style="font-weight:700; font-size:12px; color:var(--grey-500); margin-bottom:4px;">🤖 STEP-BY-STEP ANSWER</div><div class="ai-bubble" style="background:transparent; padding:0;">${esc(h.a).replace(/\n/g,'<br>')}</div></div>
+    `).join('')}</div>
+    <div id="doubtStatus"></div>
+
+    ${d.mode==='text' ? `
+      <div class="field"><textarea id="doubtInput" placeholder="Type your doubt here..."></textarea></div>
+      <button class="btn btn-primary btn-block" onclick="submitDoubt('text')">Ask AI Tutor</button>
+    ` : ''}
+    ${d.mode==='voice' ? `
+      <div style="text-align:center; margin:20px 0;">
+        <button class="mic-btn" id="micBtn" onclick="toggleVoiceDoubt()">🎤</button>
+        <div class="muted" id="voiceStatus" style="margin-top:10px; font-size:13px;">Tap to speak your doubt</div>
+      </div>
+    ` : ''}
+    ${d.mode==='image' ? `
+      <div class="field"><input type="file" accept="image/*" id="doubtImgInput" onchange="handleDoubtImage(event)"></div>
+      <div id="doubtImgPreview"></div>
+      <div class="field"><textarea id="doubtImgQuestion" placeholder="What should I solve in this image? (optional)"></textarea></div>
+      <button class="btn btn-primary btn-block" id="doubtImgSubmitBtn" onclick="submitDoubt('image')" disabled>Upload an image first</button>
+    ` : ''}
+  </div>`;
+}
+function setDoubtMode(m){ S._tmp.doubt.mode = m; render(); }
+
+async function submitDoubt(kind){
+  const d = S._tmp.doubt;
+  let question, imgData=null;
+  if(kind==='text'){ question = document.getElementById('doubtInput').value.trim(); if(!question) return; }
+  if(kind==='image'){
+    question = document.getElementById('doubtImgQuestion').value.trim() || "Please solve / explain what's shown in this image, step by step.";
+    imgData = d._pendingImg;
+    if(!imgData){ alert('Pehle image upload karo'); return; }
+  }
+  document.getElementById('doubtStatus').innerHTML = loadingBlock();
+  try{
+    const sys = `You are a patient AI tutor for a ${S.profile.klass} student (${S.profile.board} board). Respond in ${S.profile.language}. Give clear step-by-step explanations.`;
+    let answer;
+    if(kind==='image') answer = await callAIVision(sys, question, imgData, 800);
+    else answer = await callAIText(sys, question, 800);
+    d.history.unshift({q:question, a:answer, img:imgData});
+    d._pendingImg = null;
+    await grantYuh(2, "Doubt Solved");
+    render();
+  }catch(e){
+    document.getElementById('doubtStatus').innerHTML = `<div class="muted" style="color:var(--red); font-size:13px;">⚠️ ${esc(e.message)}</div>`;
+  }
+}
+
+function handleDoubtImage(ev){
+  const file = ev.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(1, 700/img.width);
+      canvas.width = img.width*scale; canvas.height = img.height*scale;
+      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      S._tmp.doubt._pendingImg = dataUrl;
+      document.getElementById('doubtImgPreview').innerHTML = `<img src="${dataUrl}" style="width:100%; max-height:160px; object-fit:cover; border-radius:12px; margin-bottom:10px;">`;
+      const btn = document.getElementById('doubtImgSubmitBtn'); btn.disabled=false; btn.textContent='Ask AI Tutor';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* voice doubt via Web Speech API, graceful fallback */
+let doubtRecognition = null;
+function toggleVoiceDoubt(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ document.getElementById('voiceStatus').textContent = "Voice input isn't supported on this browser — try Text mode."; return; }
+  const micBtn = document.getElementById('micBtn');
+  if(doubtRecognition){ doubtRecognition.stop(); return; }
+  doubtRecognition = new SR();
+  doubtRecognition.lang = S.profile.language==='Hindi' ? 'hi-IN' : 'en-IN';
+  doubtRecognition.interimResults = false;
+  micBtn.classList.add('listening');
+  document.getElementById('voiceStatus').textContent = "Listening...";
+  doubtRecognition.onresult = (ev)=>{
+    const transcript = ev.results[0][0].transcript;
+    document.getElementById('voiceStatus').textContent = `"${transcript}"`;
+    S._tmp.doubt._voiceQ = transcript;
+    askVoiceDoubt(transcript);
+  };
+  doubtRecognition.onerror = ()=>{ document.getElementById('voiceStatus').textContent = "Didn't catch that — try again or switch to Text mode."; };
+  doubtRecognition.onend = ()=>{ micBtn.classList.remove('listening'); doubtRecognition=null; };
+  doubtRecognition.start();
+}
+async function askVoiceDoubt(text){
+  const d = S._tmp.doubt;
+  document.getElementById('doubtStatus').innerHTML = loadingBlock();
+  try{
+    const sys = `You are a patient AI tutor for a ${S.profile.klass} student (${S.profile.board} board). Respond in ${S.profile.language}. Give clear step-by-step explanations.`;
+    const answer = await callAIText(sys, text, 800);
+    d.history.unshift({q:text, a:answer, img:null});
+    await grantYuh(2, "Doubt Solved");
+    render();
+  }catch(e){ document.getElementById('doubtStatus').innerHTML = `<div class="muted" style="color:var(--red);">⚠️ ${esc(e.message)}</div>`; }
+}
+</script>
+
+<script>
+/* =========================================================================
+   TEST SYSTEM — Written (MCQ / Short / Long / Book Exercise) + Oral
+   ========================================================================= */
+const WRITTEN_TYPES = [
+  {id:'mcq', icon:'☑️', label:'MCQ Test', sub:'10 questions', n:10},
+  {id:'short', icon:'✏️', label:'Short Answer', sub:'5 questions', n:5},
+  {id:'long', icon:'📜', label:'Long Answer', sub:'3 questions', n:3},
+  {id:'book', icon:'📘', label:'Book Exercise Style', sub:'6 questions', n:6},
+];
+
+function ScreenTestsHub(){
+  if(S.chapters.length===0){
+    return `<div class="topbar"><h2>Tests</h2></div><div class="scr"><div class="empty-state"><div class="ei">🧪</div><p>Add a chapter first from the Study tab to unlock tests.</p><button class="btn btn-primary" onclick="go('study')">Go to Study</button></div></div>`;
+  }
+  if(!S.activeChapterId) S.activeChapterId = S.chapters[S.chapters.length-1].id;
+  const active = S.chapters.find(c=>c.id===S.activeChapterId);
+  const history = S.testHistory.slice(-5).reverse();
+
+  return `<div class="topbar"><h2>Tests</h2></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="chip-group" style="margin-bottom:16px;">
+      ${S.chapters.map(c=>`<button class="chip ${c.id===S.activeChapterId?'active':''}" onclick="S.activeChapterId='${c.id}'; render();">${esc(c.name)}</button>`).join('')}
+    </div>
+
+    <div class="section-title">📘 Written Test Mode</div>
+    <div class="feat-grid">
+      ${WRITTEN_TYPES.map(w=>`<div class="feat-card" onclick="startWrittenTest('${w.id}')">
+        <div class="fi" style="background:var(--purple-100); color:var(--purple-700);">${w.icon}</div>
+        <div class="ft">${w.label}</div><div class="fs">${w.sub}</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="section-title">🎤 Oral Test Mode (AI Voice Exam)</div>
+    <div class="card tap" style="display:flex; align-items:center; gap:14px;" onclick="startOralTest()">
+      <div class="fi" style="background:#e8b3391a; color:var(--gold-deep); width:46px; height:46px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:22px;">🎤</div>
+      <div style="flex:1;"><div style="font-weight:700; font-size:14px;">Start Oral Exam</div><div class="muted" style="font-size:12px;">AI asks aloud · you answer by voice in 10s</div></div>
+      <div style="font-size:18px;">→</div>
+    </div>
+
+    <div class="section-title">Recent Results</div>
+    ${history.length===0? `<div class="card" style="text-align:center; color:var(--grey-500); font-size:13px;">No tests attempted yet</div>` :
+      history.map(h=>`<div class="task-item"><div class="task-check done">${Math.round(h.score)>=50?'✓':'✗'}</div><div style="flex:1;"><div style="font-weight:600; font-size:13px;">${esc(h.label)}</div><div class="muted" style="font-size:11px;">${esc(h.chapterName)}</div></div><div style="font-weight:800; font-family:var(--font-mono);">${Math.round(h.score)}%</div></div>`).join('')}
+  </div>`;
+}
+
+/* ---------- WRITTEN TEST RUNNER ---------- */
+async function startWrittenTest(typeId){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const wt = WRITTEN_TYPES.find(w=>w.id===typeId);
+  go('testRunner', {_test:{kind:'written', typeId, chapterId:c.id, status:'loading', qIndex:0, answers:[], score:null}});
+  try{
+    let data;
+    if(typeId==='mcq'){
+      data = await callAIJson("You write rigorous school exam MCQs.", `${chapterCtx(c)}\n\nReturn JSON array of ${wt.n} MCQs: [{"q":"...","options":["A","B","C","D"],"answerIndex":0,"explain":"<=12 word reason"}]. answerIndex is 0-based index of the correct option.`, 1000);
+    } else if(typeId==='short'){
+      data = await callAIJson("You write short-answer exam questions.", `${chapterCtx(c)}\n\nReturn JSON array of ${wt.n} short-answer questions: [{"q":"...","modelAnswer":"<=35 words ideal answer"}].`, 900);
+    } else if(typeId==='long'){
+      data = await callAIJson("You write long-answer exam questions.", `${chapterCtx(c)}\n\nReturn JSON array of ${wt.n} long-answer questions: [{"q":"...","modelAnswer":"<=70 words covering key points an ideal answer should hit"}].`, 900);
+    } else {
+      data = await callAIJson("You write textbook-style exercise questions like NCERT book exercises.", `${chapterCtx(c)}\n\nReturn JSON array of ${wt.n} book-exercise-style questions mixing short numerical/conceptual style: [{"q":"...","modelAnswer":"<=40 words ideal answer"}].`, 900);
+    }
+    S._test.status = 'active';
+    S._test.questions = Array.isArray(data) ? data : [];
+    if(S._test.questions.length===0) throw new Error("AI couldn't generate questions. Try again.");
+    render();
+  }catch(e){
+    S._test.status = 'error'; S._test.error = e.message; render();
+  }
+}
+
+function ScreenTestRunner(){
+  const t = S._test;
+  const c = S.chapters.find(ch=>ch.id===t.chapterId);
+  if(t.status==='loading') return `<div class="topbar"><button class="back-btn" onclick="go('tests')">←</button><h2>Preparing Test</h2><div style="width:38px;"></div></div><div class="scr">${loadingBlock()}</div>`;
+  if(t.status==='grading') return `<div class="topbar"><h2>Grading</h2></div><div class="scr"><div class="ai-loading"><div class="spinner"></div><div class="muted" id="aiStatusText" style="font-size:13.5px;">AI examiner is grading your answers...</div></div></div>`;
+  if(t.status==='error') return `<div class="topbar"><button class="back-btn" onclick="go('tests')">←</button><h2>Test</h2><div style="width:38px;"></div></div><div class="scr"><div class="empty-state"><div class="ei">⚠️</div><p>${esc(t.error)}</p><button class="btn btn-primary" onclick="startWrittenTest('${t.typeId}')">Retry</button></div></div>`;
+  if(t.status==='done') return renderWrittenResult(t, c);
+
+  const q = t.questions[t.qIndex];
+  const isMcq = t.typeId==='mcq';
+  return `<div class="topbar"><button class="back-btn" onclick="go('tests')">←</button><h2>Q${t.qIndex+1}/${t.questions.length}</h2><div style="width:38px;"></div></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="progress-track" style="margin-bottom:18px;"><div class="progress-fill" style="width:${(t.qIndex/t.questions.length)*100}%"></div></div>
+    <div class="card" style="margin-bottom:16px;"><div style="font-size:15.5px; font-weight:600; line-height:1.5;">${esc(q.q)}</div></div>
+    ${isMcq ? `
+      <div id="mcqOpts">${q.options.map((op,i)=>`<div class="mcq-opt" data-i="${i}" onclick="selectMcq(${i})"><div class="mcq-letter">${String.fromCharCode(65+i)}</div><div>${esc(op)}</div></div>`).join('')}</div>
+      <button class="btn btn-primary btn-block" id="mcqNextBtn" style="margin-top:10px;" onclick="nextWrittenQ()" disabled>Submit Answer</button>
+    ` : `
+      <textarea id="writtenAns" placeholder="Type your answer here..." style="width:100%; min-height:120px; padding:14px; border-radius:14px; border:1.5px solid var(--grey-200); background:var(--grey-50);"></textarea>
+      <button class="btn btn-primary btn-block" style="margin-top:12px;" onclick="nextWrittenQ()">Submit Answer</button>
+    `}
+  </div>`;
+}
+function selectMcq(i){
+  document.querySelectorAll('.mcq-opt').forEach(el=>el.classList.remove('sel'));
+  document.querySelector(`.mcq-opt[data-i="${i}"]`).classList.add('sel');
+  document.getElementById('mcqNextBtn').disabled = false;
+  S._tmp.mcqSel = i;
+}
+async function nextWrittenQ(){
+  const t = S._test;
+  const isMcq = t.typeId==='mcq';
+  if(isMcq){
+    t.answers.push({selected:S._tmp.mcqSel});
+    S._tmp.mcqSel = null;
+  } else {
+    const val = document.getElementById('writtenAns').value.trim();
+    t.answers.push({text:val});
+  }
+  if(t.qIndex < t.questions.length-1){
+    t.qIndex++; render();
+  } else {
+    await finishWrittenTest();
+  }
+}
+async function finishWrittenTest(){
+  const t = S._test;
+  const c = S.chapters.find(ch=>ch.id===t.chapterId);
+  t.status='grading'; render();
+  let totalScore=0;
+  if(t.typeId==='mcq'){
+    let correct=0;
+    t.questions.forEach((q,i)=>{ if(t.answers[i] && t.answers[i].selected===q.answerIndex) correct++; });
+    totalScore = (correct/t.questions.length)*100;
+    t.perQuestionScore = t.questions.map((q,i)=>({correct: t.answers[i] && t.answers[i].selected===q.answerIndex, explain:q.explain, answerIndex:q.answerIndex, selected:t.answers[i]?t.answers[i].selected:null}));
+  } else {
+    try{
+      const gradePrompt = t.questions.map((q,i)=>`Q${i+1}: ${q.q}\nModel Answer: ${q.modelAnswer}\nStudent Answer: ${t.answers[i].text || '(blank)'}`).join('\n\n');
+      const data = await callAIJson("You are a strict but fair exam grader.", `Grade each student answer against the model answer on a 0-100 scale for correctness/completeness. Return JSON array [{"score":0-100,"feedback":"<=15 words"}] in the same order.\n\n${gradePrompt}`, 900);
+      t.gradeResults = data;
+      totalScore = data.reduce((a,b)=>a+(b.score||0),0)/data.length;
+    }catch(e){
+      totalScore = 0; t.gradeResults = t.questions.map(()=>({score:0, feedback:"Could not auto-grade — review manually."}));
+    }
+  }
+  t.score = totalScore;
+  t.status='done';
+  const wtLabel = WRITTEN_TYPES.find(w=>w.id===t.typeId).label;
+  S.testHistory.push({id:uid(), chapterId:c.id, chapterName:c.name, type:t.typeId, label:wtLabel, score:totalScore, date:new Date().toISOString()});
+  await persistTests();
+  let yuh = Math.round(50 * (totalScore/100)) || 5;
+  await grantYuh(Math.max(yuh,5), `${wtLabel} Completed`);
+  await checkAchievements();
+  render();
+}
+function render0Loading(){ const app=document.getElementById('app'); /* no-op placeholder to keep UI calm during grading */ }
+
+function renderWrittenResult(t, c){
+  const wtLabel = WRITTEN_TYPES.find(w=>w.id===t.typeId).label;
+  return `<div class="topbar"><button class="back-btn" onclick="go('tests')">←</button><h2>Result</h2><div style="width:38px;"></div></div>
+  <div class="scr">
+    <div class="card glass" style="text-align:center; padding:28px 18px;">
+      <div style="font-size:13px; color:var(--grey-500); margin-bottom:6px;">${esc(wtLabel)} · ${esc(c.name)}</div>
+      <div style="font-size:42px; font-weight:800; color:var(--purple-700);">${Math.round(t.score)}%</div>
+      <div class="muted" style="margin-top:4px;">${t.score>=70?'Excellent work! 🎉':t.score>=40?'Good effort, keep practicing':'Needs more revision — try the AI Doubt Solver'}</div>
+    </div>
+    <div class="section-title">Question Breakdown</div>
+    ${t.typeId==='mcq' ?
+      t.questions.map((q,i)=>{const r=t.perQuestionScore[i]; return `<div class="card content-block">
+        <div style="font-weight:600; font-size:13.5px; margin-bottom:6px;">${i+1}. ${esc(q.q)}</div>
+        <div style="font-size:12.5px; color:${r.correct?'var(--green)':'var(--red)'}; font-weight:700;">${r.correct?'✓ Correct':'✗ Incorrect — answer: '+esc(q.options[q.answerIndex])}</div>
+        <div class="muted" style="font-size:11.5px; margin-top:3px;">${esc(q.explain||'')}</div>
+      </div>`;}).join('')
+      :
+      t.questions.map((q,i)=>{const g=t.gradeResults[i]||{score:0,feedback:''}; return `<div class="card content-block">
+        <div style="font-weight:600; font-size:13.5px; margin-bottom:6px;">${i+1}. ${esc(q.q)}</div>
+        <div style="font-size:12.5px; font-weight:700; color:var(--purple-600);">Score: ${Math.round(g.score)}%</div>
+        <div class="muted" style="font-size:11.5px; margin-top:3px;">${esc(g.feedback)}</div>
+      </div>`;}).join('')
+    }
+    <button class="btn btn-primary btn-block" style="margin-top:10px;" onclick="go('tests')">Back to Tests</button>
+  </div>`;
+}
+
+/* ---------- ORAL TEST RUNNER (AI Voice Exam) ---------- */
+async function startOralTest(){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  go('oralRunner', {_oral:{chapterId:c.id, status:'loading', qIndex:0, results:[], timeLeft:10}});
+  try{
+    const data = await callAIJson("You write spoken viva/oral exam questions.", `${chapterCtx(c)}\n\nReturn JSON array of 6 short oral exam questions (answerable in one or two spoken sentences): [{"q":"...","modelAnswer":"<=25 words ideal spoken answer"}].`, 800);
+    S._oral.status='active';
+    S._oral.questions = Array.isArray(data) ? data : [];
+    if(S._oral.questions.length===0) throw new Error("Couldn't prepare oral questions. Try again.");
+    render();
+    speakOralQuestion();
+  }catch(e){ S._oral.status='error'; S._oral.error = e.message; render(); }
+}
+
+function speakOralQuestion(){
+  const o = S._oral;
+  const q = o.questions[o.qIndex];
+  try{
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(q.q);
+    utter.lang = 'en-IN'; utter.rate = 0.95;
+    utter.onend = ()=> startOralTimer();
+    window.speechSynthesis.speak(utter);
+  }catch(e){ startOralTimer(); }
+}
+
+let oralTimerInterval = null;
+function startOralTimer(){
+  clearInterval(oralTimerInterval);
+  S._oral.timeLeft = 10;
+  const el = document.getElementById('oralTimer');
+  if(el) el.textContent = S._oral.timeLeft;
+  oralTimerInterval = setInterval(()=>{
+    S._oral.timeLeft--;
+    const el2 = document.getElementById('oralTimer');
+    if(el2) el2.textContent = Math.max(0, S._oral.timeLeft);
+    if(S._oral.timeLeft<=0){ clearInterval(oralTimerInterval); submitOralAnswer(true); }
+  }, 1000);
+}
+
+function ScreenOralRunner(){
+  const o = S._oral;
+  if(o.status==='loading') return `<div class="topbar"><button class="back-btn" onclick="exitOral()">←</button><h2>Preparing Oral Exam</h2><div style="width:38px;"></div></div><div class="scr">${loadingBlock()}</div>`;
+  if(o.status==='error') return `<div class="topbar"><button class="back-btn" onclick="exitOral()">←</button><h2>Oral Exam</h2><div style="width:38px;"></div></div><div class="scr"><div class="empty-state"><div class="ei">⚠️</div><p>${esc(o.error)}</p><button class="btn btn-primary" onclick="startOralTest()">Retry</button></div></div>`;
+  if(o.status==='done') return renderOralResult(o);
+
+  const q = o.questions[o.qIndex];
+  return `<div class="topbar"><button class="back-btn" onclick="exitOral()">←</button><h2>Oral Q${o.qIndex+1}/${o.questions.length}</h2><div style="width:38px;"></div></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="courtroom" style="padding:22px 16px;">
+      <div style="text-align:center; font-size:11px; letter-spacing:.08em; color:var(--gold); font-weight:700; margin-bottom:10px;">🎓 AI ORAL EXAMINER</div>
+      <div class="court-question"><div class="court-qnum">QUESTION ${o.qIndex+1}</div>${esc(q.q)}
+        <div style="margin-top:10px;"><button class="btn btn-sm" style="background:rgba(255,255,255,.12); color:#fff;" onclick="speakOralQuestion()">🔊 Replay Question</button></div>
+      </div>
+      <div style="text-align:center; margin-top:18px;">
+        <div style="font-size:34px; font-weight:800; font-family:var(--font-mono); color:#fff;" id="oralTimer">${o.timeLeft}</div>
+        <div class="muted" style="font-size:11px; color:rgba(255,255,255,.6);">seconds left to answer</div>
+      </div>
+      <div style="text-align:center; margin:18px 0 6px;">
+        <button class="mic-btn" id="oralMicBtn" onclick="toggleOralMic()">🎤</button>
+        <div class="muted" id="oralVoiceStatus" style="margin-top:8px; font-size:12.5px; color:rgba(255,255,255,.7);">Tap to speak your answer</div>
+      </div>
+      <textarea id="oralTextFallback" placeholder="Or type your answer..." style="width:100%; min-height:60px; margin-top:8px;"></textarea>
+      <button class="btn btn-block" style="margin-top:12px; background:linear-gradient(135deg,var(--gold),var(--gold-deep)); color:#1d1830;" onclick="submitOralAnswer(false)">Submit Answer</button>
+    </div>
+  </div>`;
+}
+
+let oralRecognition = null;
+function toggleOralMic(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ document.getElementById('oralVoiceStatus').textContent="Voice not supported here — please type your answer below."; return; }
+  const micBtn = document.getElementById('oralMicBtn');
+  if(oralRecognition){ oralRecognition.stop(); return; }
+  oralRecognition = new SR();
+  oralRecognition.lang = 'en-IN'; oralRecognition.interimResults = false;
+  micBtn.classList.add('listening');
+  document.getElementById('oralVoiceStatus').textContent = "Listening...";
+  oralRecognition.onresult = (ev)=>{
+    const transcript = ev.results[0][0].transcript;
+    document.getElementById('oralTextFallback').value = transcript;
+    document.getElementById('oralVoiceStatus').textContent = `Heard: "${transcript}"`;
+  };
+  oralRecognition.onerror = ()=>{ document.getElementById('oralVoiceStatus').textContent = "Didn't catch that — type below instead."; };
+  oralRecognition.onend = ()=>{ micBtn.classList.remove('listening'); oralRecognition=null; };
+  oralRecognition.start();
+}
+
+async function submitOralAnswer(timedOut){
+  clearInterval(oralTimerInterval);
+  if(oralRecognition){ try{oralRecognition.stop();}catch(e){} }
+  const o = S._oral;
+  const ansEl = document.getElementById('oralTextFallback');
+  const answer = ansEl ? ansEl.value.trim() : '';
+  const q = o.questions[o.qIndex];
+  document.querySelector('.courtroom').innerHTML = `<div class="ai-loading"><div class="spinner"></div><div class="muted" id="aiStatusText" style="color:rgba(255,255,255,.7);">Evaluating your answer...</div></div>`;
+  let evalResult = {score:0, feedback:"No answer given."};
+  if(answer){
+    try{
+      evalResult = await callAIJson("You are an oral examiner grading spoken answers leniently but fairly.", `Question: ${q.q}\nModel Answer: ${q.modelAnswer}\nStudent's spoken answer: ${answer}\n\nReturn JSON {"score":0-100,"feedback":"<=15 words, encouraging tone"}.`, 300);
+    }catch(e){ evalResult = {score:0, feedback:"Couldn't evaluate — moving on."}; }
+  } else if(timedOut){ evalResult = {score:0, feedback:"Time's up — no answer recorded."}; }
+  o.results.push({q:q.q, answer, score:evalResult.score, feedback:evalResult.feedback});
+  if(evalResult.score>=70) await grantYuh(2, "Correct Oral Answer", {silent:true});
+  if(o.qIndex < o.questions.length-1){
+    o.qIndex++; render(); speakOralQuestion();
+  } else {
+    await finishOralTest();
+  }
+}
+
+async function finishOralTest(){
+  const o = S._oral;
+  const c = S.chapters.find(ch=>ch.id===o.chapterId);
+  const avg = o.results.reduce((a,b)=>a+(b.score||0),0)/o.results.length;
+  o.status='done'; o.avgScore = avg;
+  S.testHistory.push({id:uid(), chapterId:c.id, chapterName:c.name, type:'oral', label:'Oral Exam', score:avg, date:new Date().toISOString()});
+  await persistTests();
+  const baseYuh = Math.round(40*(avg/100));
+  await grantYuh(Math.max(baseYuh,5), "Oral Exam Completed", {silent:true});
+  await grantYuh(8, "Oral Test Bonus");
+  await checkAchievements();
+  render();
+}
+function exitOral(){ clearInterval(oralTimerInterval); if(oralRecognition){try{oralRecognition.stop();}catch(e){}} try{window.speechSynthesis.cancel();}catch(e){} go('tests'); }
+
+function renderOralResult(o){
+  return `<div class="topbar"><button class="back-btn" onclick="go('tests')">←</button><h2>Oral Exam Result</h2><div style="width:38px;"></div></div>
+  <div class="scr">
+    <div class="card glass" style="text-align:center; padding:28px 18px;">
+      <div style="font-size:13px; color:var(--grey-500); margin-bottom:6px;">Average Score</div>
+      <div style="font-size:42px; font-weight:800; color:var(--purple-700);">${Math.round(o.avgScore)}%</div>
+    </div>
+    <div class="section-title">Per-Question Feedback</div>
+    ${o.results.map((r,i)=>`<div class="card content-block">
+      <div style="font-weight:600; font-size:13.5px; margin-bottom:5px;">${i+1}. ${esc(r.q)}</div>
+      <div class="muted" style="font-size:12px; margin-bottom:4px;">Your answer: ${esc(r.answer||'(no answer)')}</div>
+      <div style="font-size:12.5px; font-weight:700; color:var(--purple-600);">Score: ${Math.round(r.score)}% — ${esc(r.feedback)}</div>
+    </div>`).join('')}
+    <button class="btn btn-primary btn-block" style="margin-top:10px;" onclick="go('tests')">Back to Tests</button>
+  </div>`;
+}
+</script>
+
+<script>
+/* =========================================================================
+   AI DEBATE — Courtroom mode. User vs AI, judged by an AI judge.
+   ========================================================================= */
+function ScreenDebateLobby(){
+  if(S.chapters.length===0){
+    return `<div class="topbar"><h2>AI Debate</h2></div><div class="scr"><div class="empty-state"><div class="ei">⚖️</div><p>Add a chapter from Study tab first — debates are topic-based.</p><button class="btn btn-primary" onclick="go('study')">Go to Study</button></div></div>`;
+  }
+  if(!S.activeChapterId) S.activeChapterId = S.chapters[S.chapters.length-1].id;
+  const mode = S._tmp.debateMode || 'easy';
+
+  return `<div class="topbar"><button class="back-btn" onclick="go('dashboard')">←</button><h2>AI Debate</h2><div style="width:38px;"></div></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="courtroom" style="margin-bottom:18px; padding:24px 16px;">
+      <div class="court-bench">
+        <div class="judge-avatar">⚖️</div>
+        <div class="judge-label">AI Judge presiding</div>
+        <div class="gavel">🔨 Order in the court</div>
+      </div>
+      <p style="text-align:center; font-size:12.5px; color:rgba(255,255,255,.75); margin-top:8px;">Argue your answers. The judge scores both sides — highest average wins the gavel.</p>
+    </div>
+
+    <div class="section-title">Topic / Chapter</div>
+    <div class="chip-group" style="margin-bottom:6px;">
+      ${S.chapters.map(c=>`<button class="chip ${c.id===S.activeChapterId?'active':''}" onclick="S.activeChapterId='${c.id}'; render();">${esc(c.name)}</button>`).join('')}
+    </div>
+
+    <div class="section-title">Select Mode</div>
+    ${DEBATE_MODES.map(m=>`<div class="mode-card ${mode===m.id?'sel':''}" onclick="setDebateMode('${m.id}')">
+      <div class="mode-dot" style="background:${m.color};">${m.label[0]}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700; font-size:14px;">${m.label}</div>
+        <div class="muted" style="font-size:11.5px;">${m.desc} · 20 questions</div>
+      </div>
+      <div style="text-align:right; font-family:var(--font-mono); font-weight:800; font-size:13px; color:${m.color};">±${m.reward}<div style="font-size:9px; color:var(--grey-400); font-weight:600;">YUH</div></div>
+    </div>`).join('')}
+
+    <button class="btn btn-primary btn-block" style="margin-top:14px; background:linear-gradient(135deg,#5d33ab,#2b2440);" onclick="startDebate()">⚖️ Start Debate</button>
+  </div>`;
+}
+function setDebateMode(m){ S._tmp.debateMode = m; render(); }
+
+async function startDebate(){
+  const c = S.chapters.find(ch=>ch.id===S.activeChapterId);
+  const modeId = S._tmp.debateMode || 'easy';
+  const mode = DEBATE_MODES.find(m=>m.id===modeId);
+  go('debateRunner', {_debate:{chapterId:c.id, modeId, status:'loading', qIndex:0, userTotal:0, aiTotal:0, rounds:[]}});
+  try{
+    const difficultyDesc = {easy:'simple, direct, basic recall', medium:'applied understanding, moderate reasoning', hard:'tricky, multi-step reasoning, common misconceptions', veryhard:'expert-level, competitive-exam intensity, nuanced edge cases'}[modeId];
+    const questions = await callAIJson("You are setting questions for a courtroom-style academic debate game.", `${chapterCtx(c)}\n\nDifficulty: ${mode.label} (${difficultyDesc}).\nReturn a JSON array of exactly 20 short debate questions (each under 18 words) testing this chapter at that difficulty: ["question 1", "question 2", ...]`, 1000);
+    S._debate.questions = Array.isArray(questions) ? questions.slice(0,20) : [];
+    if(S._debate.questions.length===0) throw new Error("Judge couldn't prepare questions. Try again.");
+    S._debate.status='active';
+    render();
+  }catch(e){ S._debate.status='error'; S._debate.error=e.message; render(); }
+}
+
+function ScreenDebateRunner(){
+  const d = S._debate;
+  const c = S.chapters.find(ch=>ch.id===d.chapterId);
+  if(d.status==='loading') return `<div class="topbar"><button class="back-btn" onclick="exitDebate()">←</button><h2>Courtroom</h2><div style="width:38px;"></div></div><div class="scr"><div class="courtroom"><div class="ai-loading"><div class="spinner"></div><div class="muted" id="aiStatusText" style="color:rgba(255,255,255,.7);">Judge is preparing the case file...</div></div></div></div>`;
+  if(d.status==='error') return `<div class="topbar"><button class="back-btn" onclick="exitDebate()">←</button><h2>Courtroom</h2><div style="width:38px;"></div></div><div class="scr"><div class="empty-state"><div class="ei">⚠️</div><p>${esc(d.error)}</p><button class="btn btn-primary" onclick="startDebate()">Retry</button></div></div>`;
+
+  const mode = DEBATE_MODES.find(m=>m.id===d.modeId);
+  const q = d.questions[d.qIndex];
+  const userInitial = (S.profile.name||'U')[0].toUpperCase();
+  const userAvgNow = d.rounds.length ? Math.round(d.userTotal/d.rounds.length) : 0;
+  const aiAvgNow = d.rounds.length ? Math.round(d.aiTotal/d.rounds.length) : 0;
+
+  return `<div class="topbar"><button class="back-btn" onclick="exitDebate()">←</button><h2>Round ${d.qIndex+1}/20</h2><div style="width:38px;"></div></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="courtroom">
+      <div class="court-bench">
+        <div class="judge-avatar">⚖️</div>
+        <div class="judge-label">${mode.label} Mode</div>
+      </div>
+      <div class="vs-row">
+        <div class="duel-side">
+          <div class="duel-avatar user">${userInitial}</div>
+          <div class="duel-name">${esc(S.profile.name.split(' ')[0])}</div>
+          <div class="duel-score">${userAvgNow}%</div>
+        </div>
+        <div class="vs-mid">VS</div>
+        <div class="duel-side">
+          <div class="duel-avatar ai">🤖</div>
+          <div class="duel-name">AI</div>
+          <div class="duel-score">${aiAvgNow}%</div>
+        </div>
+      </div>
+      <div class="court-question">
+        <div class="court-qnum">QUESTION ${d.qIndex+1} OF 20</div>
+        ${esc(q)}
+      </div>
+      <div class="court-answerbox" style="margin-top:12px;">
+        <textarea id="debateAnswer" placeholder="Present your argument / answer..."></textarea>
+      </div>
+      <button class="btn btn-block" id="debateSubmitBtn" style="margin-top:12px; background:linear-gradient(135deg,var(--gold),var(--gold-deep)); color:#1d1830;" onclick="submitDebateRound()">Submit to Judge 🔨</button>
+      <div id="verdictArea"></div>
+    </div>
+  </div>`;
+}
+
+async function submitDebateRound(){
+  const d = S._debate;
+  const c = S.chapters.find(ch=>ch.id===d.chapterId);
+  const mode = DEBATE_MODES.find(m=>m.id===d.modeId);
+  const q = d.questions[d.qIndex];
+  const userAnswer = document.getElementById('debateAnswer').value.trim();
+  document.getElementById('debateSubmitBtn').disabled = true;
+  document.getElementById('verdictArea').innerHTML = `<div class="ai-loading" style="padding:24px 0;"><div class="spinner"></div><div class="muted" id="aiStatusText" style="color:rgba(255,255,255,.7); font-size:13px;">Judge is deliberating...</div></div>`;
+  try{
+    const difficultyDesc = {easy:'a basic student level', medium:'a moderately well-prepared student', hard:'a sharp, well-revised student', veryhard:'a top competitive-exam-level student'}[d.modeId];
+    const result = await callAIJson(
+      "You are an impartial AI courtroom judge scoring an academic debate between a student and an AI opponent.",
+      `${chapterCtx(c)}\nQuestion: "${q}"\nStudent's answer: "${userAnswer||'(no answer given)'}"\n\nFirst, write your own AI-opponent answer to this same question, written at the level of ${difficultyDesc}'s opponent (not perfect — realistic). Then score BOTH the student's answer and your AI answer for correctness/completeness on a 0-100 scale. Return ONLY JSON: {"aiAnswer":"<=35 words","userScore":0-100,"aiScore":0-100,"verdict":"<=18 words judge's remark"}`,
+      450
+    );
+    const userScore = Math.max(0, Math.min(100, Math.round(result.userScore||0)));
+    const aiScore = Math.max(0, Math.min(100, Math.round(result.aiScore||0)));
+    d.userTotal += userScore; d.aiTotal += aiScore;
+    d.rounds.push({q, userAnswer, userScore, aiAnswer:result.aiAnswer, aiScore, verdict:result.verdict});
+    const won = userScore > aiScore;
+    const tie = userScore === aiScore;
+    document.getElementById('verdictArea').innerHTML = `
+      <div class="ai-bubble" style="background:rgba(255,255,255,.08); color:#fff; margin-top:10px;">🤖 AI's answer: ${esc(result.aiAnswer)}</div>
+      <div class="verdict-row">
+        <div class="verdict-box ${won?'win':(tie?'':'lose')}"><div class="vv">${userScore}%</div><div style="font-size:10.5px; opacity:.8;">You</div></div>
+        <div class="verdict-box ${!won&&!tie?'win':(tie?'':'lose')}"><div class="vv">${aiScore}%</div><div style="font-size:10.5px; opacity:.8;">AI</div></div>
+      </div>
+      <div style="text-align:center; font-size:12px; color:var(--gold); margin-top:8px; font-style:italic;">"${esc(result.verdict||'')}"</div>
+      <button class="btn btn-block" style="margin-top:14px; background:#fff; color:var(--purple-700);" onclick="nextDebateRound()">${d.qIndex<19?'Next Question →':'See Final Verdict 🔨'}</button>
+    `;
+  }catch(e){
+    document.getElementById('verdictArea').innerHTML = `<div class="muted" style="color:#ffb4b4; margin-top:10px;">⚠️ ${esc(e.message)} </div><button class="btn btn-block" style="margin-top:10px;" onclick="submitDebateRound()">Retry</button>`;
+    document.getElementById('debateSubmitBtn').disabled = false;
+  }
+}
+function nextDebateRound(){
+  const d = S._debate;
+  if(d.qIndex < 19){ d.qIndex++; render(); }
+  else { finishDebate(); }
+}
+
+async function finishDebate(){
+  const d = S._debate;
+  const c = S.chapters.find(ch=>ch.id===d.chapterId);
+  const mode = DEBATE_MODES.find(m=>m.id===d.modeId);
+  const userAvg = d.userTotal/d.rounds.length;
+  const aiAvg = d.aiTotal/d.rounds.length;
+  let result = userAvg>aiAvg ? 'win' : (userAvg<aiAvg ? 'lose' : 'tie');
+  let yuhChange = result==='win' ? mode.reward : (result==='lose' ? -mode.reward : 0);
+  S.debateHistory.push({id:uid(), chapterId:c.id, chapterName:c.name, mode:d.modeId, userAvg, aiAvg, result, yuhChange, date:new Date().toISOString()});
+  await persistDebate();
+  if(yuhChange!==0) await grantYuh(yuhChange, result==='win' ? `Debate Won (${mode.label})` : `Debate Lost (${mode.label})`);
+  await checkAchievements();
+  go('debateResult', {_debateResultData:{userAvg, aiAvg, result, mode, rounds:d.rounds, chapterName:c.name}});
+}
+
+function ScreenDebateResult(){
+  const r = S._debateResultData;
+  const won = r.result==='win';
+  const tie = r.result==='tie';
+  return `<div class="topbar"><button class="back-btn" onclick="go('dashboard')">←</button><h2>Final Verdict</h2><div style="width:38px;"></div></div>
+  <div class="scr">
+    <div class="courtroom" style="text-align:center; padding:34px 18px;">
+      <div style="font-size:46px;">${won?'🏆':tie?'🤝':'⚖️'}</div>
+      <h2 style="color:#fff; margin:10px 0 4px;">${won?'You Win the Case!':tie?"It's a Tie":'The AI Wins This Round'}</h2>
+      <div class="muted" style="color:rgba(255,255,255,.7); font-size:13px; margin-bottom:18px;">${esc(r.chapterName)} · ${r.mode.label} Mode</div>
+      <div class="verdict-row">
+        <div class="verdict-box ${won?'win':''}"><div class="vv">${Math.round(r.userAvg)}%</div><div style="font-size:10.5px; opacity:.8;">Your Average</div></div>
+        <div class="verdict-box ${!won&&!tie?'win':''}"><div class="vv">${Math.round(r.aiAvg)}%</div><div style="font-size:10.5px; opacity:.8;">AI Average</div></div>
+      </div>
+      <div style="margin-top:16px; font-family:var(--font-mono); font-weight:800; font-size:20px; color:${won?'var(--green)':tie?'var(--gold)':'var(--red)'};">${won?'+':tie?'':'-'}${tie?0:r.mode.reward} YUH</div>
+    </div>
+    <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="go('dashboard')">Back to Dashboard</button>
+    <button class="btn btn-secondary btn-block" style="margin-top:10px;" onclick="go('debateLobby')">⚖️ Debate Again</button>
+  </div>`;
+}
+function exitDebate(){
+  if(S._debate && S._debate.status==='active' && S._debate.rounds && S._debate.rounds.length>0){
+    if(!confirm('Debate abhi chalu hai — chhod ke jaana hai? Progress save nahi hoga is round ka.')) return;
+  }
+  go('debateLobby');
+}
+</script>
+
+<script>
+/* =========================================================================
+   SMART PLANNER — works correctly for BOTH 7-day and 30-day plans
+   (deterministic local scheduling — no reliance on AI to count days right,
+   which is exactly the class of bug being fixed here)
+   ========================================================================= */
+const PLAN_ACTIVITIES = ["Read Summary","Revise Notes","Practice Flashcards","Learn Definitions","Attempt MCQ Test","Oral Practice Round","Formula Sheet Review","AI Doubt Solving Session"];
+
+function ScreenPlanner(){
+  const days = S._tmp.planDays || 7;
+  return `<div class="topbar"><h2>Smart Planner</h2></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="card glass" style="margin-bottom:18px;">
+      <div style="font-weight:700; margin-bottom:10px; font-size:14.5px;">Create a new study plan</div>
+      <div class="toggle-row">
+        <button class="${days===7?'active':''}" onclick="setPlanDays(7)">7-Day Plan</button>
+        <button class="${days===30?'active':''}" onclick="setPlanDays(30)">30-Day Plan</button>
+      </div>
+      <div class="muted" style="font-size:12px; margin-bottom:12px;">${S.chapters.length} chapter${S.chapters.length===1?'':'s'} will be cycled across ${days} days. Exam countdown supported below.</div>
+      <div class="field" style="margin-bottom:10px;"><label>Exam Date (optional)</label><input type="date" id="examDate"></div>
+      <button class="btn btn-primary btn-block" onclick="generatePlan()">📅 Generate ${days}-Day Plan</button>
+    </div>
+
+    ${S.plans.length===0 ? `<div class="empty-state"><div class="ei">📅</div><p>No plans yet — create your first one above.</p></div>` : ''}
+    ${S.plans.slice().reverse().map(p=>renderPlanCard(p)).join('')}
+  </div>`;
+}
+function setPlanDays(n){ S._tmp.planDays = n; render(); }
+
+async function generatePlan(){
+  if(S.chapters.length===0){ alert('Pehle Study tab se ek chapter add karo'); return; }
+  const days = S._tmp.planDays || 7;
+  const examDateVal = document.getElementById('examDate').value;
+  const entries = [];
+  const startDate = new Date();
+  for(let i=0;i<days;i++){
+    const date = new Date(startDate); date.setDate(date.getDate()+i);
+    const chapter = S.chapters[i % S.chapters.length];
+    const isRevisionDay = (i+1) % 7 === 0; // every 7th day = revision/test day
+    let tasks = [];
+    if(isRevisionDay){
+      tasks = [
+        {subject:chapter.subject, chapter:chapter.name, activity:"Full Revision of past chapters"},
+        {subject:chapter.subject, chapter:chapter.name, activity:"Attempt a Written Test"}
+      ];
+    } else {
+      const act1 = PLAN_ACTIVITIES[i % PLAN_ACTIVITIES.length];
+      const act2 = PLAN_ACTIVITIES[(i+3) % PLAN_ACTIVITIES.length];
+      tasks = [
+        {subject:chapter.subject, chapter:chapter.name, activity:act1},
+        {subject:chapter.subject, chapter:chapter.name, activity:act2}
+      ];
+    }
+    entries.push({day:i+1, date:date.toISOString().slice(0,10), tasks, done:false});
+  }
+  const plan = { id:uid(), days, startDate:startDate.toISOString().slice(0,10), examDate:examDateVal||null, chapterIds:S.chapters.map(c=>c.id), entries };
+  S.plans.push(plan);
+  await persistPlans();
+  await checkAchievements();
+  render();
+}
+
+function renderPlanCard(p){
+  const today = new Date().toISOString().slice(0,10);
+  const daysLeft = p.examDate ? Math.ceil((new Date(p.examDate)-new Date())/(1000*3600*24)) : null;
+  const completedDays = p.entries.filter(e=>e.done).length;
+  return `<div class="card" style="margin-bottom:16px;">
+    <div class="row between" style="margin-bottom:10px;">
+      <div>
+        <div style="font-weight:800; font-size:14.5px;">${p.days}-Day Plan</div>
+        <div class="muted" style="font-size:11.5px;">Started ${esc(p.startDate)} ${daysLeft!==null?`· Exam in ${daysLeft}d`:''}</div>
+      </div>
+      <button class="icon-btn" style="width:32px;height:32px;font-size:13px;" onclick="deletePlan('${p.id}')">🗑️</button>
+    </div>
+    <div class="progress-track" style="margin-bottom:12px;"><div class="progress-fill" style="width:${(completedDays/p.days)*100}%"></div></div>
+    <div style="max-height:340px; overflow-y:auto;">
+    ${p.entries.map(e=>`<div class="day-card" style="${e.date===today?'border-color:var(--purple-400); background:var(--purple-50);':''}">
+      <div class="day-head">
+        <div class="dn">Day ${e.day} ${e.date===today?'· Today':''}</div>
+        <div class="dd">${esc(e.date)}</div>
+      </div>
+      ${e.tasks.map(t=>`<div class="plan-task"><input type="checkbox" ${e.done?'checked':''} onchange="togglePlanDay('${p.id}',${e.day})"><div><b>${esc(t.subject)}</b> — ${esc(t.chapter)}: ${esc(t.activity)}</div></div>`).join('')}
+    </div>`).join('')}
+    </div>
+  </div>`;
+}
+async function togglePlanDay(planId, day){
+  const p = S.plans.find(pl=>pl.id===planId);
+  const e = p.entries.find(en=>en.day===day);
+  e.done = !e.done;
+  await persistPlans();
+  if(e.done) await grantYuh(3, "Plan Day Completed");
+  render();
+}
+async function deletePlan(id){
+  if(!confirm('Yeh plan delete karna hai?')) return;
+  S.plans = S.plans.filter(p=>p.id!==id);
+  await persistPlans();
+  render();
+}
+</script>
+
+<script>
+/* =========================================================================
+   PROGRESS SCREEN
+   ========================================================================= */
+function ScreenProgress(){
+  const g = S.gami;
+  const xpPct = Math.min(100, Math.round((g.xp/xpForLevel(g.level))*100));
+  const bySubject = {};
+  S.testHistory.forEach(t=>{
+    const c = S.chapters.find(ch=>ch.id===t.chapterId);
+    const subj = c ? c.subject : 'General';
+    bySubject[subj] = bySubject[subj] || {total:0, count:0};
+    bySubject[subj].total += t.score; bySubject[subj].count++;
+  });
+  const subjectAverages = Object.entries(bySubject).map(([k,v])=>({subject:k, avg:v.total/v.count})).sort((a,b)=>a.avg-b.avg);
+  const weakTopics = subjectAverages.filter(s=>s.avg<50);
+  const debateWins = S.debateHistory.filter(d=>d.result==='win').length;
+  const debateTotal = S.debateHistory.length;
+
+  return `<div class="topbar"><h2>Progress</h2></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="profile-card" style="margin-bottom:18px;">
+      <div class="row between" style="position:relative; z-index:1;">
+        <div><div style="font-size:12px; opacity:.85;">Level</div><div style="font-size:26px; font-weight:800;">⭐ ${g.level}</div></div>
+        <div style="text-align:right;"><div style="font-size:12px; opacity:.85;">Total YUH Earned</div><div style="font-size:20px; font-weight:800;">🪙 ${g.totalEarned}</div></div>
+      </div>
+      <div class="xp-track"><div class="xp-fill" style="width:${xpPct}%"></div></div>
+      <div style="font-size:11px; opacity:.85; margin-top:5px;">${g.xp} / ${xpForLevel(g.level)} XP</div>
+    </div>
+
+    <div class="section-title">Study Streak</div>
+    <div class="card row between"><div><div style="font-weight:700; font-size:20px;">🔥 ${g.streak} days</div><div class="muted" style="font-size:12px;">Keep logging in daily!</div></div></div>
+
+    <div class="section-title">Test Performance by Subject</div>
+    ${subjectAverages.length===0 ? `<div class="card" style="text-align:center; color:var(--grey-500); font-size:13px;">Take some tests to see analytics here</div>` :
+      `<div class="card">${subjectAverages.map(s=>`<div class="bar-row"><div class="bl">${esc(s.subject)}</div><div class="bt"><div class="progress-fill" style="width:${s.avg}%; background:${s.avg<50?'linear-gradient(90deg,#f0a3ad,var(--red))':'linear-gradient(90deg,var(--purple-400),var(--purple-600))'};"></div></div><div class="bv">${Math.round(s.avg)}%</div></div>`).join('')}</div>`
+    }
+
+    <div class="section-title">🎯 Weak Topic Detection (AI)</div>
+    ${weakTopics.length===0 ? `<div class="card" style="text-align:center; color:var(--grey-500); font-size:13px;">No weak topics detected yet — nice work!</div>` :
+      weakTopics.map(w=>`<div class="task-item"><div class="task-check" style="border-color:var(--red); color:var(--red);">!</div><div style="flex:1;"><div style="font-weight:700; font-size:13px;">${esc(w.subject)}</div><div class="muted" style="font-size:11.5px;">Average ${Math.round(w.avg)}% — revise with AI Doubt Solver</div></div></div>`).join('')
+    }
+
+    <div class="section-title">⚖️ AI Debate Record</div>
+    <div class="card row between"><div><div style="font-weight:700; font-size:15px;">${debateWins} / ${debateTotal} won</div><div class="muted" style="font-size:12px;">${debateTotal===0?'No debates yet':((debateWins/debateTotal*100).toFixed(0))+'% win rate'}</div></div><div style="font-size:24px;">🏆</div></div>
+
+    <div class="section-title">🏅 All Achievements</div>
+    <div class="feat-grid">
+      ${ACHIEVEMENT_DEFS.map(a=>{ const got = S.achievementsUnlocked.includes(a.id); return `<div class="feat-card" style="${got?'':'opacity:.4;'}"><div class="fi" style="background:var(--purple-100); color:var(--purple-700);">${a.icon}</div><div class="ft">${a.title}</div><div class="fs">${a.desc}</div></div>`; }).join('')}
+    </div>
+  </div>`;
+}
+</script>
+
+<script>
+/* =========================================================================
+   PROFILE SCREEN
+   ========================================================================= */
+function ScreenProfile(){
+  const p = S.profile;
+  const initials = p.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  return `<div class="topbar"><h2>Profile</h2></div>
+  <div class="scr" style="padding-top:6px;">
+    <div class="card glass" style="text-align:center; padding:24px;">
+      <div class="avatar" style="width:70px; height:70px; font-size:26px; margin:0 auto 10px; background:linear-gradient(150deg,var(--purple-400),var(--purple-700)); color:#fff;">${initials}</div>
+      <div style="font-weight:800; font-size:17px;">${esc(p.name)}</div>
+      <div class="muted" style="font-size:12.5px;">${esc(p.klass)} · ${esc(p.board)}</div>
+    </div>
+
+    <div class="section-title">Preferences</div>
+    <div class="card" style="margin-bottom:10px;">
+      <div class="row between" style="padding:6px 0;"><div style="font-size:14px; font-weight:600;">Dark Mode</div><button class="theme-toggle" onclick="toggleTheme()"><div class="dot"></div></button></div>
+    </div>
+    <div class="card">
+      <div class="field" style="margin-bottom:10px;"><label>Language of Study</label>
+        <div class="chip-group">${LANGUAGE_LIST.map(l=>`<button class="chip ${p.language===l?'active':''}" onclick="changeLanguage('${l}')">${l}</button>`).join('')}</div>
+      </div>
+    </div>
+
+    <div class="section-title">Your Subjects</div>
+    <div class="chip-group">${p.subjects.map(s=>`<span class="chip active" style="pointer-events:none;">${esc(s)}</span>`).join('')}</div>
+
+    <div class="section-title">⚡ Backup AI (optional)</div>
+    <div class="card">
+      <div style="font-size:13px; line-height:1.5; color:var(--grey-600); margin-bottom:10px;">
+        Pinnacle's main AI is built in and free. If it's ever busy, you can add your own <b>free Gemini API key</b> from
+        <span style="color:var(--purple-600); font-weight:600;">ai.google.dev</span> as a backup — the app will switch to it automatically only if the main AI fails.
+      </div>
+      <div class="field" style="margin-bottom:8px;"><input type="text" id="geminiKeyInput" placeholder="Paste Gemini API key (optional)" value="${esc(p.geminiKey||'')}"></div>
+      <button class="btn btn-secondary btn-sm" onclick="saveGeminiKey()">Save Backup Key</button>
+      <div class="muted" style="font-size:10.5px; margin-top:8px;">Stored privately in your account only. No AI provider truly has zero limits — this just adds a second pool of free quota.</div>
+    </div>
+
+    <div class="section-title">Stats</div>
+    <div class="quick-grid">
+      <div class="quick-card"><div class="qi">🪙</div><div class="qt">${S.gami.yuh} YUH</div><div class="qs">Current Balance</div></div>
+      <div class="quick-card"><div class="qi">📚</div><div class="qt">${S.chapters.length}</div><div class="qs">Chapters Added</div></div>
+      <div class="quick-card"><div class="qi">🧪</div><div class="qt">${S.testHistory.length}</div><div class="qs">Tests Attempted</div></div>
+      <div class="quick-card"><div class="qi">⚖️</div><div class="qt">${S.debateHistory.length}</div><div class="qs">Debates Fought</div></div>
+    </div>
+
+    <div class="section-title">Danger Zone</div>
+    <button class="btn btn-danger btn-block" onclick="resetAllData()">Reset All My Data</button>
+    <p class="muted" style="text-align:center; font-size:11px; margin-top:20px;">Pinnacle AI Study · v1.0 · Your data stays yours</p>
+  </div>`;
+}
+async function changeLanguage(l){ S.profile.language = l; await persistProfile(); render(); }
+async function saveGeminiKey(){
+  const val = document.getElementById('geminiKeyInput').value.trim();
+  S.profile.geminiKey = val;
+  await persistProfile();
+  alert(val ? 'Backup AI key saved ✅' : 'Backup key cleared.');
+}
+async function resetAllData(){
+  if(!confirm('Pakka? Yeh sab data permanently delete kar dega — chapters, notes, tests, YUH, sab kuch.')) return;
+  for(const k of Object.values(STORE_KEYS)){ try{ localStorage.removeItem(k); }catch(e){} }
+  location.reload();
+}
+</script>
+
+<script>
+/* =========================================================================
+   APP BOOT
+   ========================================================================= */
+async function bootApp(){
+  const splashStart = Date.now();
+  await loadAll();
+  if(S.profile && S.profile.name){
+    await touchStreak();
+    go('dashboard');
+  } else {
+    go('landing');
+  }
+  const elapsed = Date.now() - splashStart;
+  setTimeout(()=>{ const sp = document.getElementById('bootSplash'); if(sp) sp.classList.add('hide'); }, Math.max(0, 500 - elapsed));
+}
+bootApp();
+</script>
+</body>
+</html>
